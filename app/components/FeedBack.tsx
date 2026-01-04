@@ -1,14 +1,129 @@
-const FeedBack = () => {
+import { Link, useFetcher, useLocation, useSearchParams } from "react-router";
+import { useEffect, useRef } from "react";
+
+const translations = {
+  feedback: {
+    ru: "Обратная связь",
+    ee: "Tagasiside",
+  },
+  feedbackText: {
+    ru: "Расскажите, что вы думаете — нам действительно важно ваше мнение",
+    ee: "Rääkige meile, mida te arvate — teie arvamus on meile tõesti oluline",
+  },
+  email: {
+    ru: "Э-Почта",
+    ee: "E-post",
+  },
+  emailInputPlaceholder: {
+    ru: "Ваша э-почта",
+    ee: "Teie e-post",
+  },
+  message: {
+    ru: "Сообщение",
+    ee: "Sõnum",
+  },
+  messagesPlaceholder: {
+    ru: "Ваше сообщение",
+    ee: "Teie sõnum",
+  },
+  privacyFirst: {
+    ru: "Я согласен(на) с обработкой моей электронной почты в соответствии с",
+    ee: "Olen nõus oma e-posti aadressi töötlemisega vastavalt",
+  },
+  privacyPolicy: {
+    ru: "Политикой конфиденциальности",
+    ee: "Privaatsuspoliitikaga",
+  },
+  send: {
+    ru: "Отправить",
+    ee: "Saada",
+  },
+  thanksForFeedback: {
+    ru: "Спасибо за обратную связь!",
+    ee: "Täname tagasiside eest!",
+  },
+  errorOccured: {
+    ru: "Произошла ошибка, попробуйте позже!",
+    ee: "Tekkis viga, palun proovige hiljem uuesti!",
+  },
+};
+
+import useToastStore from "~/stores/toastModalStore";
+
+const FeedBack = ({
+  email,
+  tel,
+  address,
+}: {
+  email: string;
+  tel: string;
+  address: string;
+}) => {
+  const fetcher = useFetcher();
+  const formRef = useRef<HTMLFormElement>(null);
+  const [searchParams] = useSearchParams();
+  const lang = searchParams.get("lang") as "ee" | "ru";
+
+  const signature = useRef<string | null>(null);
+
+  const location = useLocation();
+
+  //Handle toast
+  const openToast = useToastStore((state) => state.openToast);
+  const setToastInnerContent = useToastStore(
+    (state) => state.setToastInnerContent
+  );
+  const setToastVariant = useToastStore((state) => state.setToastVariant);
+
+  useEffect(() => {
+    if (fetcher.data) {
+      const { resultId, ok } = fetcher.data;
+
+      if (signature.current === resultId) return;
+
+      signature.current = resultId;
+
+      //Handle success
+      if (ok) {
+        //Clear form
+        formRef.current?.reset();
+
+        //Show toast
+        setToastVariant("success");
+        setToastInnerContent(
+          <>
+            <span className="text-lg">
+              {translations.thanksForFeedback[lang]}
+            </span>
+          </>
+        );
+        openToast();
+      } else {
+        //Show toast
+        setToastVariant("error");
+        setToastInnerContent(
+          <>
+            <span className="text-lg">{translations.errorOccured[lang]}</span>
+          </>
+        );
+        openToast();
+      }
+    }
+  }, [fetcher.data, fetcher.state]);
+
   return (
-    <div className="mx-auto px-4 py-8 sm:px-6 lg:px-8 xl:px-20 xl:py-20 2xl:px-64 2xl:py-44">
+    <div
+      id="feedback"
+      className="mx-auto px-4 py-8 sm:px-6 lg:px-8 xl:px-20 xl:py-20 2xl:px-64 2xl:py-44"
+    >
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         <div className="md:py-4">
           <h2 className="text-3xl font-semibold text-gray-900 sm:text-3xl xl:text-4xl 2xl:text-5xl">
-            Обратная связь
+            {translations.feedback[lang]}
           </h2>
 
           <p className="mt-4 lg:text-lg xl:text-xl 2xl:text-2xl text-pretty text-gray-700">
-            Расскажите, что вы думаете — нам действительно важно ваше мнение
+            {translations.feedbackText[lang]}
           </p>
 
           <dl className="mt-6 space-y-3">
@@ -31,7 +146,7 @@ const FeedBack = () => {
                   ></path>
                 </svg>
 
-                <span className="font-medium">+372 5366 4448</span>
+                <span className="font-medium">{tel ? tel : ""}</span>
               </dd>
             </div>
 
@@ -54,7 +169,7 @@ const FeedBack = () => {
                   ></path>
                 </svg>
 
-                <span className="font-medium">info@abik.ee</span>
+                <span className="font-medium">{email ? email : ""}</span>
               </dd>
             </div>
 
@@ -77,17 +192,19 @@ const FeedBack = () => {
                   ></path>
                 </svg>
 
-                <span className="font-medium">123, Tallinn, Estonia</span>
+                <span className="font-medium">{address ? address : ""}</span>
               </dd>
             </div>
           </dl>
         </div>
 
-        <form
-          action="#"
+        <fetcher.Form
+          action="/feedback"
+          method="POST"
+          ref={formRef}
           className="space-y-4 rounded-lg border border-gray-300 bg-gray-100 p-6 2xl:p-10"
         >
-          <div>
+          {/* <div>
             <label
               className="block text-sm font-medium text-gray-900 2xl:text-lg"
               htmlFor="name"
@@ -99,49 +216,85 @@ const FeedBack = () => {
               className="mt-1 w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:outline-none bg-white py-2 px-2 border 2xl:text-lg"
               id="name"
               type="text"
+              name="name"
               placeholder="Ваше имя"
+              required
             />
-          </div>
-
+          </div> */}
           <div>
             <label
               className="block text-sm font-medium text-gray-900 2xl:text-lg"
               htmlFor="email"
             >
-              Э-Почта
+              {translations.email[lang]}
             </label>
 
             <input
               className="mt-1 w-full rounded-lg border-gray-300 focus:border-indigo-500 focus:outline-none bg-white py-2 px-2 border 2xl:text-lg"
               id="email"
               type="email"
-              placeholder="Ваша э-почта"
+              placeholder={translations.emailInputPlaceholder[lang]}
+              name="email"
+              required
             />
           </div>
-
           <div>
             <label
               className="block text-sm font-medium text-gray-900 2xl:text-lg"
               htmlFor="message"
             >
-              Сообщение
+              {translations.message[lang]}
             </label>
 
             <textarea
               className="mt-1 w-full resize-none rounded-lg border-gray-300 focus:border-indigo-500 focus:outline-none bg-white py-2 px-2 border 2xl:text-lg"
               id="message"
               rows={4}
-              placeholder="Ваше сообщение"
+              placeholder={translations.messagesPlaceholder[lang]}
+              name="message"
+              required
             ></textarea>
           </div>
+          <input
+            type="text"
+            name="website"
+            autoComplete="off"
+            className="hidden"
+            tabIndex={-1}
+          />
+          <input type="hidden" name="ts" value={String(Date.now())} />
 
+          {/* Agreement about use of email */}
+          <div className="flex items-start gap-2">
+            <input
+              type="checkbox"
+              required
+              className="checkbox"
+              name="agreedToProceed"
+              id="agreedToProceed"
+            />
+            <p>
+              {translations.privacyFirst[lang]}{" "}
+              <Link
+                to={{
+                  pathname: "/privacy-policy",
+                  search: location.search,
+                }}
+                className="link link-primary"
+              >
+                {translations.privacyPolicy[lang]}
+              </Link>
+            </p>
+          </div>
+
+          {/* Submit btn */}
           <button
-            className="block w-full rounded-lg border border-indigo-600 bg-indigo-600 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 2xl:text-lg"
+            className="block cursor-pointer w-full rounded-lg border border-indigo-600 bg-indigo-600 px-12 py-3 text-sm font-medium text-white transition-colors hover:bg-transparent hover:text-indigo-600 2xl:text-lg mt-5"
             type="submit"
           >
-            Отправить
+            {translations.send[lang]}
           </button>
-        </form>
+        </fetcher.Form>
       </div>
     </div>
   );

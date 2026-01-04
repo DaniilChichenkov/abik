@@ -1,0 +1,246 @@
+import {
+  Form,
+  NavLink,
+  redirect,
+  useLocation,
+  useNavigate,
+  useSearchParams,
+  type ActionFunction,
+  type ActionFunctionArgs,
+  type LoaderFunction,
+  type LoaderFunctionArgs,
+} from "react-router";
+import { useState } from "react";
+
+import { X } from "lucide-react";
+
+const translations = {
+  changeTitle: {
+    ru: "Изменить заголовок",
+    ee: "Muuda pealkirja",
+  },
+  typeHere: {
+    ru: "Введите здесь",
+    ee: "Sisestage siia",
+  },
+  categoryNameTaken: {
+    ru: "Название категории уже занято",
+    ee: "Kategooria nimi on juba kasutusel",
+  },
+  confirm: {
+    ru: "Подтвердить",
+    ee: "Kinnita",
+  },
+};
+
+type Props = {
+  loaderData: {
+    _id: string;
+    title: {
+      ee: string;
+      ru: string;
+    };
+  };
+  actionData: {
+    ok: boolean;
+    errors: Record<string, boolean>;
+  };
+};
+const AdminSelectedCategoryRename = ({ loaderData, actionData }: Props) => {
+  const [categoryNameEE, setCategoryNameEE] = useState(loaderData.title.ee);
+  const [categoryNameRU, setCategoryNameRU] = useState(loaderData.title.ru);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const [searchParams] = useSearchParams();
+  const lang = searchParams.get("lang") as "ee" | "ru";
+
+  return (
+    <div className="card bg-base-100 shadow-md w-full md:w-[20rem] mt-5 relative">
+      <div className="card-body w-full">
+        <Form method="POST" action={`.${location.search}`}>
+          {/* New name est */}
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">
+              {translations.changeTitle[lang]} (EST)
+            </legend>
+            <input
+              name="newCategoryNameEE"
+              type="text"
+              className={`input ${actionData?.errors && actionData.errors.duplicatedFieldEE && "input-error"}`}
+              placeholder={translations.typeHere[lang]}
+              value={categoryNameEE}
+              onChange={(e) => setCategoryNameEE(e.target.value)}
+              required
+            />
+            {actionData?.errors && actionData.errors.duplicatedFieldEE ? (
+              <p className="label text-red-500">
+                {translations.categoryNameTaken[lang]}
+              </p>
+            ) : null}
+          </fieldset>
+
+          {/* New name rus */}
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">
+              {translations.changeTitle[lang]} (RUS)
+            </legend>
+            <input
+              name="newCategoryNameRU"
+              type="text"
+              className={`input ${actionData?.errors && actionData.errors.duplicatedFieldRU && "input-error"}`}
+              placeholder={translations.typeHere[lang]}
+              value={categoryNameRU}
+              onChange={(e) => setCategoryNameRU(e.target.value)}
+              required
+            />
+            {actionData?.errors && actionData.errors.duplicatedFieldRU ? (
+              <p className="label text-red-500">
+                {translations.categoryNameTaken[lang]}
+              </p>
+            ) : null}
+          </fieldset>
+
+          {/* Hidden input with id of category */}
+          <input type="hidden" name="categoryId" value={loaderData._id} />
+
+          <div className="justify-end card-actions mt-5">
+            <button className="btn btn-primary">
+              {translations.confirm[lang]}
+            </button>
+          </div>
+        </Form>
+      </div>
+
+      {/* Close form button */}
+      <NavLink
+        to={`/admin/gallery/${loaderData._id}?${searchParams.toString()}`}
+        className="absolute top-0 right-0 btn btn-error text-white btn-sm"
+      >
+        <X />
+      </NavLink>
+    </div>
+  );
+};
+
+export const loader: LoaderFunction = async ({
+  params,
+}: LoaderFunctionArgs) => {
+  //Import DB modules
+  const { connectToDB } = await import("~/utils/db");
+  const GalleryModel = (await import("~/models/galleryModel")).default;
+  const mongoose = await import("mongoose");
+
+  //Get param
+  const { selectedGalleryCategory } = params;
+
+  if (!selectedGalleryCategory) {
+    throw new Response("noCategoryProvided", { status: 400 });
+  }
+
+  try {
+    await connectToDB();
+
+    const galleryCategory = await GalleryModel.findOne(
+      {
+        _id: new mongoose.Types.ObjectId(selectedGalleryCategory),
+      },
+      { __v: 0, content: 0 }
+    ).lean();
+
+    if (!galleryCategory) {
+      throw new Response("noCategoryFound", { status: 404 });
+    }
+
+    return {
+      ...galleryCategory,
+      _id: galleryCategory?._id.toString(),
+    };
+  } catch (error) {
+    throw new Response("serverSideError", { status: 500 });
+  }
+};
+
+export const action: ActionFunction = async ({
+  request,
+}: ActionFunctionArgs) => {
+  //Import DB modules
+  const { connectToDB } = await import("~/utils/db");
+  const GalleryModel = (await import("~/models/galleryModel")).default;
+  const mongoose = await import("mongoose");
+
+  //Get form data
+  const formData = await request.formData();
+  const newCategoryNameEE = formData.get("newCategoryNameEE");
+  const newCategoryNameRU = formData.get("newCategoryNameRU");
+  const categoryId = formData.get("categoryId");
+
+  //Validate form fields
+  const formValidationErrors: Record<string, boolean> = {};
+  if (!newCategoryNameEE || typeof newCategoryNameEE !== "string") {
+    formValidationErrors.noCategoryNameEE = true;
+  }
+  if (!newCategoryNameRU || typeof newCategoryNameRU !== "string") {
+    formValidationErrors.noCategoryNameRU = true;
+  }
+  if (!categoryId || typeof categoryId !== "string") {
+    formValidationErrors.noCategoryId = true;
+  }
+
+  //If any validation errors exists - send ok:false
+  if (Object.keys(formValidationErrors).length > 0) {
+    return {
+      ok: false,
+      errors: { ...formValidationErrors },
+    };
+  }
+
+  //Try to create new record in db
+  try {
+    await connectToDB();
+
+    await GalleryModel.findOneAndUpdate(
+      {
+        _id: new mongoose.Types.ObjectId(categoryId as string),
+      },
+      {
+        title: {
+          ee: newCategoryNameEE,
+          ru: newCategoryNameRU,
+        },
+      }
+    );
+
+    const url = new URL(request.url);
+    return redirect(`/admin/gallery/${categoryId}${url.search}`);
+  } catch (error: any) {
+    //Handle duplicate keys error
+    if (error?.code === 11000) {
+      const duplicatedFields = Object.keys(error.keyValue ?? {})[0];
+
+      const errorsForClient: Record<string, boolean> = {};
+
+      if (duplicatedFields === "title.ee") {
+        errorsForClient.duplicatedFieldEE = true;
+      } else if (duplicatedFields === "title.ru") {
+        errorsForClient.duplicatedFieldRU = true;
+      }
+
+      return {
+        ok: false,
+        errors: {
+          ...errorsForClient,
+        },
+      };
+    }
+    return {
+      ok: false,
+      errors: {
+        serverSideError: true,
+      },
+    };
+  }
+};
+
+export default AdminSelectedCategoryRename;

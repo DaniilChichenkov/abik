@@ -5,10 +5,21 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  type LoaderFunctionArgs,
+  useRouteLoaderData,
+  redirect,
+  useLoaderData,
+  type MetaFunction,
 } from "react-router";
 
 import type { Route } from "./+types/root";
 import "./app.css";
+
+const SUPPORTED_LANG = new Set(["ee", "ru"]);
+const HTML_LANG_MAP: Record<string, string> = {
+  ee: "et",
+  ru: "ru",
+};
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -24,8 +35,10 @@ export const links: Route.LinksFunction = () => [
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
+  const data = useLoaderData();
+
   return (
-    <html lang="en">
+    <html lang={data.safeLang}>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -72,4 +85,22 @@ export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
       )}
     </main>
   );
+}
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const url = new URL(request.url);
+
+  //Get language from url and if not provided - set default one to EE
+  let lang = url.searchParams.get("lang");
+  if (!lang) {
+    url.searchParams.set("lang", "ee");
+    throw redirect(url.toString(), 302);
+  }
+
+  const safeLang = SUPPORTED_LANG.has(lang) ? lang : "ee";
+  const htmlLang = HTML_LANG_MAP[safeLang] ?? "et";
+
+  return {
+    safeLang: htmlLang,
+  };
 }

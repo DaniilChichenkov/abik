@@ -1,0 +1,41 @@
+import mongoose from "mongoose";
+
+const serviceRequestSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+  },
+  phoneNumber: {
+    type: String,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
+  service: {
+    title: {
+      ru: { type: String, required: true },
+      ee: { type: String, required: true },
+    },
+    price: {
+      type: Number,
+      required: true,
+    },
+  },
+  serviceCategory: {
+    title: {
+      ru: { type: String, required: true },
+      ee: { type: String, required: true },
+    },
+  },
+  completed: {
+    type: Boolean,
+    default: false,
+  },
+});
+
+const ServiceRequestModel = mongoose.model(
+  "ServiceRequest",
+  serviceRequestSchema
+);
+export default ServiceRequestModel;
