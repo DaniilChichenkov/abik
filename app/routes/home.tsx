@@ -68,6 +68,7 @@ type Props = {
       ee: string;
       ru: string;
       _id: string;
+      priceType: "perHour" | "perService";
     }[];
     otherServiceCategoriesContentForClient: {
       _id: string;

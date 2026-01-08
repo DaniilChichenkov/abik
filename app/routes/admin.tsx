@@ -33,6 +33,7 @@ type Props = {
           ee: string;
           ru: string;
         };
+        priceType: "perHour" | "perService";
       };
     }[];
   };

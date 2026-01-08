@@ -177,7 +177,7 @@ export const CategorySelectionList = ({
   const lang = searchParams.get("lang") as "ee" | "ru";
 
   return (
-    <div className="w-full grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-7 2xl:grid-cols-12 gap-x-5 gap-y-5 mt-5">
+    <div className="w-full grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-x-5 gap-y-5 mt-5">
       {categories.map((item) => (
         <CategoryListItem
           key={item._id}

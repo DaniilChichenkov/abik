@@ -30,6 +30,26 @@ const translations = {
     ru: "Подтвердить",
     ee: "Kinnita",
   },
+  selectTariff: {
+    ru: "Выберите тариф",
+    ee: "Valige tariif",
+  },
+  perHour: {
+    ru: "За час",
+    ee: "Tunni kohta",
+  },
+  perService: {
+    ru: "За всю услугу",
+    ee: "Kogu teenuse eest",
+  },
+  priceType: {
+    ru: "Тип расчёта",
+    ee: "Arvestuse tüüp",
+  },
+  errorSelectTariff: {
+    ru: "Необходимо выбрать тариф",
+    ee: "Tuleb valida tariif",
+  },
 };
 
 type Props = {
@@ -39,6 +59,7 @@ type Props = {
     ru: string;
     _id: string;
     parentId: string;
+    priceType: "perHour" | "perService";
   };
   actionData: {
     ok: boolean;
@@ -124,11 +145,33 @@ const AdminSelectedServiceCategoryContentItemChange = ({
                 onChange={(e) => setServicePrice(e.target.value)}
                 required
               />
-              {/* {actionData?.errors && actionData.errors.duplicatedFieldRU ? (
+            </fieldset>
+
+            {/* Service price type */}
+            <fieldset className="fieldset">
+              <legend className="fieldset-legend">
+                {translations.priceType[lang]}
+              </legend>
+              <select
+                id="tariffSelect"
+                name="priceType"
+                defaultValue={loaderData.priceType}
+                className="select"
+                required
+              >
+                <option disabled={true}>
+                  {translations.selectTariff[lang]}
+                </option>
+                <option value="perHour">{translations.perHour[lang]}</option>
+                <option value="perService">
+                  {translations.perService[lang]}
+                </option>
+              </select>
+              {actionData?.errors && actionData.errors.newServicePriceType ? (
                 <p className="label text-red-500">
-                  Category name is already taken
+                  {translations.errorSelectTariff[lang]}
                 </p>
-              ) : null} */}
+              ) : null}
             </fieldset>
 
             {/* Hidden input with id of category (To which category service will be added) */}
@@ -242,6 +285,7 @@ export const action: ActionFunction = async ({
   const newServicePrice = formData.get("newServicePrice");
   const categoryToAppendItemIn = formData.get("serviceCategoryToAppendId");
   const contentItemToChange = formData.get("contentItemToChangeId");
+  const servicePriceType = formData.get("priceType");
 
   //Validate form fields
   const formValidationErrors: Record<string, boolean> = {};
@@ -259,6 +303,9 @@ export const action: ActionFunction = async ({
   }
   if (!contentItemToChange || typeof contentItemToChange !== "string") {
     formValidationErrors.contentItemToChange = true;
+  }
+  if (!servicePriceType || typeof servicePriceType !== "string") {
+    formValidationErrors.newServicePriceType = true;
   }
 
   //If any validation errors exists - send ok:false
@@ -283,6 +330,7 @@ export const action: ActionFunction = async ({
           "content.$.ee": newServiceTitleEE,
           "content.$.ru": newServiceTitleRU,
           "content.$.price": newServicePrice,
+          "content.$.priceType": servicePriceType,
         },
       }
     );

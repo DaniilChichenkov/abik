@@ -17,8 +17,8 @@ const translations = {
     ee: "Edukalt üles laaditud:",
   },
   conflict: {
-    ru: "Конфликт:",
-    ee: "Konflikt:",
+    ru: "Конфликт",
+    ee: "Konflikt",
   },
   inOrderToUploadConflicted: {
     ru: "Чтобы загрузить конфликтующие файлы, переименуйте их и попробуйте снова",

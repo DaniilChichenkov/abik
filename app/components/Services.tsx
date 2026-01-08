@@ -87,6 +87,14 @@ const translations = {
     ru: "К сожалению произошла ошибка, повторите попытку позже",
     ee: "Kahjuks tekkis viga, palun proovige hiljem uuesti",
   },
+  perHour: {
+    ru: "За час",
+    ee: "Tunni kohta",
+  },
+  perService: {
+    ru: "За всю услугу",
+    ee: "Kogu teenuse eest",
+  },
 };
 
 const ServicesCategorySelectionButton = ({
@@ -122,6 +130,7 @@ const ServiceItem = ({
   price,
   _id,
   contactInfo,
+  priceType,
 }: {
   title: string;
   price: number;
@@ -131,6 +140,7 @@ const ServiceItem = ({
     email: string;
     address: string;
   };
+  priceType: "perHour" | "perService";
 }) => {
   const openModal = useClientModalStore((state) => state.openModal);
   const closeModal = useClientModalStore((state) => state.closeModal);
@@ -165,7 +175,10 @@ const ServiceItem = ({
             </p>
             <p className="font-bold text-lg">
               {translations.price[lang]}:{" "}
-              <span className="font-normal">{price}</span>
+              <span className="font-normal">{price}&#8364;</span>
+              <span className="underline font-normal ml-1">
+                {translations[priceType][lang]}
+              </span>
             </p>
           </div>
         </div>
@@ -301,7 +314,10 @@ const ServiceItem = ({
                 </p>
                 <p className="font-bold text-lg">
                   {translations.price[lang]}:{" "}
-                  <span className="font-normal">{price}</span>
+                  <span className="font-normal">{price}&#8364;</span>
+                  <span className="underline font-normal ml-1">
+                    {translations[priceType][lang]}
+                  </span>
                 </p>
               </div>
 
@@ -355,8 +371,12 @@ const ServiceItem = ({
     <div className="card card-border bg-base-100 w-full h-full overflow-scroll">
       <div className="card-body">
         <h2 className="card-title text-2xl font-bold 2xl:text-3xl">{title}</h2>
-        <p className="text-lg 2xl:text-xl">
-          {translations.price[lang]}: <span className="font-bold">{price}</span>
+        <p className="text-lg">
+          {translations.price[lang]}:{" "}
+          <span className="font-normal">{price}&#8364;</span>
+          <span className="underline font-normal ml-1">
+            {translations[priceType][lang]}
+          </span>
         </p>
         <div className="card-actions justify-end">
           <button
@@ -377,6 +397,7 @@ type Props = {
     ee: string;
     ru: string;
     _id: string;
+    priceType: "perHour" | "perService";
   }[];
   otherServicesCategories: {
     _id: string;
@@ -432,6 +453,7 @@ const Services = ({
                 price={item.price}
                 key={item._id}
                 contactInfo={contactInfo}
+                priceType={item.priceType}
               />
             ))}
           </div>

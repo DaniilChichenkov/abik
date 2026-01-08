@@ -31,6 +31,26 @@ const translations = {
     ru: "Подтвердить",
     ee: "Kinnita",
   },
+  selectTariff: {
+    ru: "Выберите тариф",
+    ee: "Valige tariif",
+  },
+  perHour: {
+    ru: "За час",
+    ee: "Tunni kohta",
+  },
+  perService: {
+    ru: "За всю услугу",
+    ee: "Kogu teenuse eest",
+  },
+  priceType: {
+    ru: "Тип расчёта",
+    ee: "Arvestuse tüüp",
+  },
+  errorSelectTariff: {
+    ru: "Необходимо выбрать тариф",
+    ee: "Tuleb valida tariif",
+  },
 };
 
 type Props = {
@@ -132,6 +152,31 @@ const AdminSelectedServiceCategoryNewService = ({
             ) : null}
           </fieldset>
 
+          {/* Tariff selection */}
+          <fieldset className="fieldset">
+            <legend className="fieldset-legend">
+              {translations.priceType[lang]}
+            </legend>
+            <select
+              id="tariffSelect"
+              name="priceType"
+              defaultValue="Pick a browser"
+              className="select"
+              required
+            >
+              <option disabled={true}>{translations.selectTariff[lang]}</option>
+              <option value="perHour">{translations.perHour[lang]}</option>
+              <option value="perService">
+                {translations.perService[lang]}
+              </option>
+            </select>
+            {actionData?.errors && actionData.errors.newServicePriceType ? (
+              <p className="label text-red-500">
+                {translations.errorSelectTariff[lang]}
+              </p>
+            ) : null}
+          </fieldset>
+
           {/* Hidden input with id of category (To which category service will be added) */}
           <input
             type="hidden"
@@ -171,6 +216,7 @@ export const action: ActionFunction = async ({
   const newServiceTitleEE = formData.get("newServiceTitleEE");
   const newServiceTitleRU = formData.get("newServiceTitleRU");
   const newServicePrice = formData.get("newServicePrice");
+  const newServicePriceType = formData.get("priceType");
   const categoryToAppendItemIn = formData.get("serviceCategoryToAppendId");
 
   //Validate form fields
@@ -186,6 +232,9 @@ export const action: ActionFunction = async ({
   }
   if (!categoryToAppendItemIn || typeof categoryToAppendItemIn !== "string") {
     formValidationErrors.categoryToAppendItemIn = true;
+  }
+  if (!newServicePriceType || typeof newServicePriceType !== "string") {
+    formValidationErrors.newServicePriceType = true;
   }
 
   //If any validation errors exists - send ok:false
@@ -210,6 +259,7 @@ export const action: ActionFunction = async ({
             price: newServicePrice,
             ee: newServiceTitleEE,
             ru: newServiceTitleRU,
+            priceType: newServicePriceType,
           },
         },
       }

@@ -120,6 +120,7 @@ export const action: ActionFunction = async ({
           ru: serviceCategoryFromDB.content[0].ru,
         },
         price: serviceCategoryFromDB.content[0].price,
+        priceType: serviceCategoryFromDB.content[0].priceType,
       },
     });
 

@@ -45,6 +45,14 @@ const translations = {
     ru: "Отметить как выполнено",
     ee: "Märgi lõpetatuks",
   },
+  perHour: {
+    ru: "За час",
+    ee: "Tunni kohta",
+  },
+  perService: {
+    ru: "За всю услугу",
+    ee: "Kogu teenuse eest",
+  },
 };
 
 const RequestsListItem = ({
@@ -55,6 +63,7 @@ const RequestsListItem = ({
   serviceCategory,
   servicePrice,
   serviceTitle,
+  servicePriceType,
 }: {
   email: string;
   _id: string;
@@ -63,6 +72,7 @@ const RequestsListItem = ({
   serviceCategory: string;
   servicePrice: number;
   serviceTitle: string;
+  servicePriceType: "perHour" | "perService";
 }) => {
   const setInnerContent = useAdminBetterModalStore(
     (state) => state.setInnerContent
@@ -148,9 +158,12 @@ const RequestsListItem = ({
           <span className="font-normal">{translations.service[lang]}</span>{" "}
           {serviceTitle}
         </p>
-        <p className="text-lg font-bold">
-          <span className="font-normal">{translations.servicePrice[lang]}</span>{" "}
-          {servicePrice}
+        <p className="text-lg">
+          {translations.servicePrice[lang]}{" "}
+          <span className="font-normal">{servicePrice}&#8364;</span>
+          <span className="underline font-normal ml-1">
+            {translations[servicePriceType][lang]}
+          </span>
         </p>
 
         {itemType === "pending" ? (
@@ -202,6 +215,7 @@ const RequestsList = ({
       };
     };
     service: {
+      priceType: "perHour" | "perService";
       price: number;
       title: {
         ee: string;
@@ -228,6 +242,7 @@ const RequestsList = ({
             serviceTitle={item.service.title[lang]}
             servicePrice={item.service.price}
             itemType={type}
+            servicePriceType={item.service.priceType}
           />
         ))) ||
         null}

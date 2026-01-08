@@ -21,6 +21,7 @@ const serviceRequestSchema = new mongoose.Schema({
       type: Number,
       required: true,
     },
+    priceType: { type: String, required: true },
   },
   serviceCategory: {
     title: {

@@ -36,6 +36,18 @@ const translations = {
     ru: "Услуга",
     ee: "Teenus",
   },
+  perHour: {
+    ru: "За час",
+    ee: "Tunni kohta",
+  },
+  perService: {
+    ru: "За всю услугу",
+    ee: "Kogu teenuse eest",
+  },
+  priceType: {
+    ru: "Тип расчёта",
+    ee: "Arvestuse tüüp",
+  },
 };
 
 type ContentItemProps = {
@@ -44,6 +56,7 @@ type ContentItemProps = {
   titleRU: string;
   titleEE: string;
   parentId: string;
+  priceType: "perHour" | "perService";
 };
 const AdminSelectedServiceCategoryContentItem = ({
   id,
@@ -51,6 +64,7 @@ const AdminSelectedServiceCategoryContentItem = ({
   price,
   titleEE,
   titleRU,
+  priceType,
 }: ContentItemProps) => {
   const openModal = useAdminModalStore((state) => state.openModal);
   const setActionRoute = useAdminModalStore((state) => state.setActionRoute);
@@ -68,6 +82,10 @@ const AdminSelectedServiceCategoryContentItem = ({
         <p className="text-lg">
           {translations.price[lang]} {price}
         </p>
+        <p className="text-lg">
+          {translations.priceType[lang]} : {translations[priceType][lang]}
+        </p>
+
         <div className="justify-end card-actions">
           <NavLink
             to={{
@@ -112,6 +130,7 @@ type Props = {
       ee: string;
       ru: string;
       _id: string;
+      priceType: "perHour" | "perService";
     }[];
   };
 };
@@ -211,6 +230,7 @@ const AdminSelectedServiceCategory = ({ loaderData }: Props) => {
             titleRU={item.ru}
             price={item.price}
             key={item._id}
+            priceType={item.priceType}
           />
         ))}
       </div>
