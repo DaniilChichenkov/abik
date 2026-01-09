@@ -85,6 +85,7 @@ export const action: ActionFunction = async ({
       },
     });
   } catch (error) {
+    console.log(error);
     return {
       ok: false,
       errors: {
