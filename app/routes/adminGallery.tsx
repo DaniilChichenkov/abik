@@ -154,6 +154,9 @@ export const action: ActionFunction = async ({
         },
       };
     }
+
+    console.log(error);
+
     return {
       ok: false,
       errors: {
