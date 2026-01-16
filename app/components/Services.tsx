@@ -99,6 +99,10 @@ const translations = {
     ru: "От объема",
     ee: "Sõltub mahust",
   },
+  additionalInfo: {
+    ru: "Дополнительная информация",
+    ee: "Lisainfo",
+  },
 };
 
 const ServicesCategorySelectionButton = ({
@@ -124,7 +128,7 @@ const ServicesCategorySelectionButton = ({
       preventScrollReset
       className={`btn h-full overflow-scroll 2xl:btn-lg ${active && "btn-primary"}`}
     >
-      {content}
+      <p className="py-2">{content}</p>
     </NavLink>
   );
 };
@@ -135,6 +139,7 @@ const ServiceItem = ({
   _id,
   contactInfo,
   priceType,
+  additionalInfo,
 }: {
   title: string;
   price: number | "volumeBased";
@@ -145,6 +150,10 @@ const ServiceItem = ({
     address: string;
   };
   priceType: "perHour" | "perService";
+  additionalInfo: {
+    ru: string;
+    ee: string;
+  };
 }) => {
   const openModal = useClientModalStore((state) => state.openModal);
   const closeModal = useClientModalStore((state) => state.closeModal);
@@ -194,6 +203,11 @@ const ServiceItem = ({
                   </span>
                 </>
               )}
+            </p>
+
+            {/* Additional info about service */}
+            <p className="whitespace-pre-wrap">
+              {additionalInfo && additionalInfo[lang] && additionalInfo[lang]}
             </p>
           </div>
         </div>
@@ -345,6 +359,12 @@ const ServiceItem = ({
                     </>
                   )}
                 </p>
+                {/* Additional info about service */}
+                <p className="whitespace-pre-wrap">
+                  {additionalInfo &&
+                    additionalInfo[lang] &&
+                    additionalInfo[lang]}
+                </p>
               </div>
 
               {/* Info about support */}
@@ -415,6 +435,12 @@ const ServiceItem = ({
             </>
           )}
         </p>
+        {/* Additional info about service */}
+        <p className="whitespace-pre-wrap">
+          {additionalInfo && additionalInfo[lang] && additionalInfo[lang]}
+        </p>
+
+        {/* Make a request button */}
         <div className="card-actions justify-end">
           <button
             onClick={() => handleServiceRequest(_id)}
@@ -435,6 +461,10 @@ type Props = {
     ru: string;
     _id: string;
     priceType: "perHour" | "perService";
+    additionalInfo: {
+      ru: string;
+      ee: string;
+    };
   }[];
   otherServicesCategories: {
     _id: string;
@@ -491,6 +521,7 @@ const Services = ({
                 key={item._id}
                 contactInfo={contactInfo}
                 priceType={item.priceType}
+                additionalInfo={item.additionalInfo}
               />
             ))}
           </div>

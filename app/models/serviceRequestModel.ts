@@ -28,6 +28,10 @@ const serviceRequestSchema = new mongoose.Schema({
       },
     },
     priceType: { type: String, required: true },
+    additionalInfo: {
+      ru: { type: String },
+      ee: { type: String },
+    },
   },
   serviceCategory: {
     title: {

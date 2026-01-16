@@ -6,6 +6,7 @@ import {
   type ActionFunctionArgs,
   useLocation,
   useSearchParams,
+  NavLink,
 } from "react-router";
 import { X } from "lucide-react";
 import { useState } from "react";
@@ -55,6 +56,10 @@ const translations = {
     ru: "От объема",
     ee: "Sõltub mahust",
   },
+  additionalInfo: {
+    ru: "Дополнительная информация",
+    ee: "Lisainfo",
+  },
 };
 
 type Props = {
@@ -92,6 +97,19 @@ const AdminSelectedServiceCategoryNewService = ({
   //Track selected tariff and if "volumeBased" selected - hide price input
   const [isVolumeBasedTariffSelected, setIsVolumeBasedTariffSelected] =
     useState(false);
+
+  //Track additional info input language
+  const [additionalInfoInputLanguage, setAdditionalInfoInputLanguage] =
+    useState<"ru" | "ee">("ee");
+  const [
+    additionalInfoInputLanguageDropdownOpen,
+    setAdditionalInfoInputLanguageDropdownOpen,
+  ] = useState(false);
+
+  const handleAdditionalInfoInputDropdownClick = (lang: "ru" | "ee") => {
+    setAdditionalInfoInputLanguage(lang);
+    setAdditionalInfoInputLanguageDropdownOpen(false);
+  };
 
   return (
     <div className="card bg-base-100 shadow-md w-full md:w-[20rem] mt-5 relative">
@@ -183,6 +201,7 @@ const AdminSelectedServiceCategoryNewService = ({
                   setServicePrice("volumeBased");
                 } else {
                   setIsVolumeBasedTariffSelected(false);
+                  setServicePrice("");
                 }
               }}
             >
@@ -202,6 +221,66 @@ const AdminSelectedServiceCategoryNewService = ({
             ) : null}
           </fieldset>
 
+          {/* Additional info */}
+          <fieldset className="fieldset mt-5">
+            <div className="w-full flex justify-between items-center">
+              <legend className="fieldset-legend">
+                {translations.additionalInfo[lang]}
+              </legend>
+
+              {/* Language selection dropdown */}
+              <details
+                className="dropdown dropdown-end"
+                open={additionalInfoInputLanguageDropdownOpen}
+              >
+                <summary
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setAdditionalInfoInputLanguageDropdownOpen((prev) => !prev);
+                  }}
+                  className="btn m-1"
+                >
+                  {additionalInfoInputLanguage}
+                </summary>
+                <ul className="menu dropdown-content bg-base-100 rounded-box z-1 w-16 p-2 shadow-sm space-y-2">
+                  <li>
+                    <button
+                      type="button"
+                      className={`btn flex justify-center ${additionalInfoInputLanguage === "ee" && "btn-primary"}`}
+                      onClick={() =>
+                        handleAdditionalInfoInputDropdownClick("ee")
+                      }
+                    >
+                      ee
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      className={`btn flex justify-center ${additionalInfoInputLanguage === "ru" && "btn-primary"}`}
+                      onClick={() =>
+                        handleAdditionalInfoInputDropdownClick("ru")
+                      }
+                    >
+                      ru
+                    </button>
+                  </li>
+                </ul>
+              </details>
+            </div>
+            <textarea
+              name="serviceAdditionalInfoEE"
+              className={`textarea h-24 ${additionalInfoInputLanguage === "ru" && "hidden"}`}
+              placeholder={translations.typeHere[lang]}
+            ></textarea>
+
+            <textarea
+              name="serviceAdditionalInfoRU"
+              className={`textarea h-24 ${additionalInfoInputLanguage === "ee" && "hidden"}`}
+              placeholder={translations.typeHere[lang]}
+            ></textarea>
+          </fieldset>
+
           {/* Hidden input with id of category (To which category service will be added) */}
           <input
             type="hidden"
@@ -218,12 +297,18 @@ const AdminSelectedServiceCategoryNewService = ({
       </div>
 
       {/* Close form button */}
-      <button
+      {/* <button
         onClick={() => navigate(-1)}
         className="absolute top-0 right-0 btn btn-error text-white btn-sm"
       >
         <X />
-      </button>
+      </button> */}
+      <NavLink
+        to={`/admin/services/${params.selectedServiceCategory}?${searchParams.toString()}`}
+        className="absolute top-0 right-0 btn btn-error text-white btn-sm"
+      >
+        <X />
+      </NavLink>
     </div>
   );
 };
@@ -243,6 +328,8 @@ export const action: ActionFunction = async ({
   const newServicePrice = formData.get("newServicePrice");
   const newServicePriceType = formData.get("priceType");
   const categoryToAppendItemIn = formData.get("serviceCategoryToAppendId");
+  const newServiceAdditionalInfoRU = formData.get("serviceAdditionalInfoRU");
+  const newServiceAdditionalInfoEE = formData.get("serviceAdditionalInfoEE");
 
   //Validate form fields
   const formValidationErrors: Record<string, boolean> = {};
@@ -254,8 +341,7 @@ export const action: ActionFunction = async ({
   }
   if (
     !newServicePrice ||
-    typeof +newServicePrice !== "number" ||
-    newServicePrice !== "volumeBased"
+    (typeof +newServicePrice !== "number" && newServicePrice !== "volumeBased")
   ) {
     formValidationErrors.noNewServicePrice = true;
   }
@@ -264,6 +350,18 @@ export const action: ActionFunction = async ({
   }
   if (!newServicePriceType || typeof newServicePriceType !== "string") {
     formValidationErrors.newServicePriceType = true;
+  }
+  if (
+    newServiceAdditionalInfoRU &&
+    typeof newServiceAdditionalInfoRU !== "string"
+  ) {
+    formValidationErrors.invalidAdditionalInfo = true;
+  }
+  if (
+    newServiceAdditionalInfoEE &&
+    typeof newServiceAdditionalInfoEE !== "string"
+  ) {
+    formValidationErrors.invalidAdditionalInfo = true;
   }
 
   //If any validation errors exists - send ok:false
@@ -289,6 +387,10 @@ export const action: ActionFunction = async ({
             ee: newServiceTitleEE,
             ru: newServiceTitleRU,
             priceType: newServicePriceType,
+            additionalInfo: {
+              ru: newServiceAdditionalInfoRU || "",
+              ee: newServiceAdditionalInfoEE || "",
+            },
           },
         },
       }

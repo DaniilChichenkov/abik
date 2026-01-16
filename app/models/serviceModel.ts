@@ -21,6 +21,10 @@ const serviceSchema = new mongoose.Schema({
       ee: { type: String, required: true },
       ru: { type: String, required: true },
       priceType: { type: String, required: true },
+      additionalInfo: {
+        ru: { type: String },
+        ee: { type: String },
+      },
     },
   ],
 });

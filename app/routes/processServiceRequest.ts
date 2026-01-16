@@ -124,6 +124,10 @@ export const action: ActionFunction = async ({
             ? "volumeBased"
             : +serviceCategoryFromDB.content[0].price,
         priceType: serviceCategoryFromDB.content[0].priceType,
+        additionalInfo: {
+          ru: serviceCategoryFromDB.content[0].additionalInfo?.ru || "",
+          ee: serviceCategoryFromDB.content[0].additionalInfo?.ee || "",
+        },
       },
     });
 

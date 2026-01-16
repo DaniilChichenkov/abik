@@ -54,6 +54,10 @@ const translations = {
     ru: "Необходимо выбрать тариф",
     ee: "Tuleb valida tariif",
   },
+  additionalInfo: {
+    ru: "Дополнительная информация",
+    ee: "Lisainfo",
+  },
 };
 
 type Props = {
@@ -64,6 +68,10 @@ type Props = {
     _id: string;
     parentId: string;
     priceType: "perHour" | "perService";
+    additionalInfo: {
+      ee: string;
+      ru: string;
+    };
   };
   actionData: {
     ok: boolean;
@@ -91,6 +99,19 @@ const AdminSelectedServiceCategoryContentItemChange = ({
   //Track selected tariff and if "volumeBased" selected - hide price input
   const [isVolumeBasedTariffSelected, setIsVolumeBasedTariffSelected] =
     useState<null | boolean>(null);
+
+  //Track additional info input language
+  const [additionalInfoInputLanguage, setAdditionalInfoInputLanguage] =
+    useState<"ru" | "ee">("ee");
+  const [
+    additionalInfoInputLanguageDropdownOpen,
+    setAdditionalInfoInputLanguageDropdownOpen,
+  ] = useState(false);
+
+  const handleAdditionalInfoInputDropdownClick = (lang: "ru" | "ee") => {
+    setAdditionalInfoInputLanguage(lang);
+    setAdditionalInfoInputLanguageDropdownOpen(false);
+  };
 
   return (
     <article className="mt-10">
@@ -206,6 +227,70 @@ const AdminSelectedServiceCategoryContentItemChange = ({
               ) : null}
             </fieldset>
 
+            {/* Additional info */}
+            <fieldset className="fieldset mt-5">
+              <div className="w-full flex justify-between items-center">
+                <legend className="fieldset-legend">
+                  {translations.additionalInfo[lang]}
+                </legend>
+
+                {/* Language selection dropdown */}
+                <details
+                  className="dropdown dropdown-end"
+                  open={additionalInfoInputLanguageDropdownOpen}
+                >
+                  <summary
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setAdditionalInfoInputLanguageDropdownOpen(
+                        (prev) => !prev
+                      );
+                    }}
+                    className="btn m-1"
+                  >
+                    {additionalInfoInputLanguage}
+                  </summary>
+                  <ul className="menu dropdown-content bg-base-100 rounded-box z-1 w-16 p-2 shadow-sm space-y-2">
+                    <li>
+                      <button
+                        type="button"
+                        className={`btn flex justify-center ${additionalInfoInputLanguage === "ee" && "btn-primary"}`}
+                        onClick={() =>
+                          handleAdditionalInfoInputDropdownClick("ee")
+                        }
+                      >
+                        ee
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        type="button"
+                        className={`btn flex justify-center ${additionalInfoInputLanguage === "ru" && "btn-primary"}`}
+                        onClick={() =>
+                          handleAdditionalInfoInputDropdownClick("ru")
+                        }
+                      >
+                        ru
+                      </button>
+                    </li>
+                  </ul>
+                </details>
+              </div>
+              <textarea
+                name="serviceAdditionalInfoEE"
+                className={`textarea h-24 ${additionalInfoInputLanguage === "ru" && "hidden"}`}
+                placeholder={translations.typeHere[lang]}
+                defaultValue={loaderData.additionalInfo.ee}
+              ></textarea>
+
+              <textarea
+                name="serviceAdditionalInfoRU"
+                className={`textarea h-24 ${additionalInfoInputLanguage === "ee" && "hidden"}`}
+                placeholder={translations.typeHere[lang]}
+                defaultValue={loaderData.additionalInfo.ru}
+              ></textarea>
+            </fieldset>
+
             {/* Hidden input with id of category (To which category service will be added) */}
             <input
               type="hidden"
@@ -318,6 +403,8 @@ export const action: ActionFunction = async ({
   const categoryToAppendItemIn = formData.get("serviceCategoryToAppendId");
   const contentItemToChange = formData.get("contentItemToChangeId");
   const servicePriceType = formData.get("priceType");
+  const newServiceAdditionalInfoRU = formData.get("serviceAdditionalInfoRU");
+  const newServiceAdditionalInfoEE = formData.get("serviceAdditionalInfoEE");
 
   //Validate form fields
   const formValidationErrors: Record<string, boolean> = {};
@@ -327,7 +414,10 @@ export const action: ActionFunction = async ({
   if (!newServiceTitleRU || typeof newServiceTitleRU !== "string") {
     formValidationErrors.newServiceTitleRU = true;
   }
-  if (!newServicePrice || typeof +newServicePrice !== "number") {
+  if (
+    !newServicePrice ||
+    (typeof +newServicePrice !== "number" && newServicePrice !== "volumeBased")
+  ) {
     formValidationErrors.noNewServicePrice = true;
   }
   if (!categoryToAppendItemIn || typeof categoryToAppendItemIn !== "string") {
@@ -338,6 +428,18 @@ export const action: ActionFunction = async ({
   }
   if (!servicePriceType || typeof servicePriceType !== "string") {
     formValidationErrors.newServicePriceType = true;
+  }
+  if (
+    newServiceAdditionalInfoRU &&
+    typeof newServiceAdditionalInfoRU !== "string"
+  ) {
+    formValidationErrors.invalidAdditionalInfo = true;
+  }
+  if (
+    newServiceAdditionalInfoEE &&
+    typeof newServiceAdditionalInfoEE !== "string"
+  ) {
+    formValidationErrors.invalidAdditionalInfo = true;
   }
 
   //If any validation errors exists - send ok:false
@@ -363,6 +465,8 @@ export const action: ActionFunction = async ({
           "content.$.ru": newServiceTitleRU,
           "content.$.price": newServicePrice,
           "content.$.priceType": servicePriceType,
+          "content.$.additionalInfo.ee": newServiceAdditionalInfoEE,
+          "content.$.additionalInfo.ru": newServiceAdditionalInfoRU,
         },
       }
     );

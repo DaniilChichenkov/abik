@@ -68,6 +68,7 @@ const RequestsListItem = ({
   servicePrice,
   serviceTitle,
   servicePriceType,
+  additionalInfo,
 }: {
   email: string;
   _id: string;
@@ -77,6 +78,10 @@ const RequestsListItem = ({
   servicePrice: number | "volumeBased";
   serviceTitle: string;
   servicePriceType: "perHour" | "perService";
+  additionalInfo: {
+    ru: string;
+    ee: string;
+  };
 }) => {
   const setInnerContent = useAdminBetterModalStore(
     (state) => state.setInnerContent
@@ -180,6 +185,12 @@ const RequestsListItem = ({
             </>
           )}
         </p>
+        <p>
+          {/* Additional info about service */}
+          <p className="whitespace-pre-wrap">
+            {additionalInfo && additionalInfo[lang] && additionalInfo[lang]}
+          </p>
+        </p>
 
         {itemType === "pending" ? (
           <>
@@ -236,6 +247,10 @@ const RequestsList = ({
         ee: string;
         ru: string;
       };
+      additionalInfo: {
+        ru: string;
+        ee: string;
+      };
     };
   }[];
   type: "pending" | "completed";
@@ -258,6 +273,7 @@ const RequestsList = ({
             servicePrice={item.service.price}
             itemType={type}
             servicePriceType={item.service.priceType}
+            additionalInfo={item.service.additionalInfo}
           />
         ))) ||
         null}

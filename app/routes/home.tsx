@@ -64,11 +64,12 @@ type Props = {
   loaderData: {
     ok: boolean;
     selectedServiceCategoryContentForClient: {
-      price: number;
+      price: number | "volumeBased";
       ee: string;
       ru: string;
       _id: string;
       priceType: "perHour" | "perService";
+      additionalInfo: string;
     }[];
     otherServiceCategoriesContentForClient: {
       _id: string;
