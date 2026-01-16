@@ -28,7 +28,7 @@ type Props = {
         };
       };
       service: {
-        price: number;
+        price: number | "volumeBased";
         title: {
           ee: string;
           ru: string;

@@ -119,7 +119,10 @@ export const action: ActionFunction = async ({
           ee: serviceCategoryFromDB.content[0].ee,
           ru: serviceCategoryFromDB.content[0].ru,
         },
-        price: serviceCategoryFromDB.content[0].price,
+        price:
+          serviceCategoryFromDB.content[0].price === "volumeBased"
+            ? "volumeBased"
+            : +serviceCategoryFromDB.content[0].price,
         priceType: serviceCategoryFromDB.content[0].priceType,
       },
     });

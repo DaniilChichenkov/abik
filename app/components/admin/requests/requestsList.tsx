@@ -53,6 +53,10 @@ const translations = {
     ru: "За всю услугу",
     ee: "Kogu teenuse eest",
   },
+  priceVolumeBased: {
+    ru: "От объема",
+    ee: "Sõltub mahust",
+  },
 };
 
 const RequestsListItem = ({
@@ -70,7 +74,7 @@ const RequestsListItem = ({
   itemType: "pending" | "completed";
   phoneNumber: string | null;
   serviceCategory: string;
-  servicePrice: number;
+  servicePrice: number | "volumeBased";
   serviceTitle: string;
   servicePriceType: "perHour" | "perService";
 }) => {
@@ -159,11 +163,22 @@ const RequestsListItem = ({
           {serviceTitle}
         </p>
         <p className="text-lg">
-          {translations.servicePrice[lang]}{" "}
-          <span className="font-normal">{servicePrice}&#8364;</span>
-          <span className="underline font-normal ml-1">
-            {translations[servicePriceType][lang]}
-          </span>
+          {servicePrice === "volumeBased" ? (
+            <>
+              {translations.servicePrice[lang]}{" "}
+              <span className="underline font-normal ml-1">
+                {translations.priceVolumeBased[lang]}
+              </span>
+            </>
+          ) : (
+            <>
+              {translations.servicePrice[lang]}{" "}
+              <span className="font-normal">{servicePrice}&#8364;</span>
+              <span className="underline font-normal ml-1">
+                {translations[servicePriceType][lang]}
+              </span>
+            </>
+          )}
         </p>
 
         {itemType === "pending" ? (

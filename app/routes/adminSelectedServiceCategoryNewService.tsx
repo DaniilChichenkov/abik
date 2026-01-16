@@ -51,6 +51,10 @@ const translations = {
     ru: "Необходимо выбрать тариф",
     ee: "Tuleb valida tariif",
   },
+  volumeBased: {
+    ru: "От объема",
+    ee: "Sõltub mahust",
+  },
 };
 
 type Props = {
@@ -84,6 +88,10 @@ const AdminSelectedServiceCategoryNewService = ({
 
   const [searchParams] = useSearchParams();
   const lang = searchParams.get("lang") as "ee" | "ru";
+
+  //Track selected tariff and if "volumeBased" selected - hide price input
+  const [isVolumeBasedTariffSelected, setIsVolumeBasedTariffSelected] =
+    useState(false);
 
   return (
     <div className="card bg-base-100 shadow-md w-full md:w-[20rem] mt-5 relative">
@@ -133,16 +141,22 @@ const AdminSelectedServiceCategoryNewService = ({
 
           {/* New service price */}
           <fieldset className="fieldset">
-            <legend className="fieldset-legend">
+            <legend
+              className={`${isVolumeBasedTariffSelected && "hidden"} fieldset-legend`}
+            >
               {translations.servicePrice[lang]}
             </legend>
             <input
               name="newServicePrice"
-              type="string"
+              type={isVolumeBasedTariffSelected ? "hidden" : "string"}
               className={`input ${actionData?.errors && actionData.errors.duplicatedFieldRU && "input-error"}`}
               placeholder={translations.typeHere[lang]}
               value={servicePrice}
-              onChange={(e) => setServicePrice(e.target.value)}
+              onChange={(e) => {
+                if (!isVolumeBasedTariffSelected) {
+                  setServicePrice(e.target.value);
+                }
+              }}
               required
             />
             {actionData?.errors && actionData.errors.duplicatedFieldRU ? (
@@ -163,11 +177,22 @@ const AdminSelectedServiceCategoryNewService = ({
               defaultValue="Pick a browser"
               className="select"
               required
+              onChange={(e) => {
+                if (e.target.value === "volumeBased") {
+                  setIsVolumeBasedTariffSelected(true);
+                  setServicePrice("volumeBased");
+                } else {
+                  setIsVolumeBasedTariffSelected(false);
+                }
+              }}
             >
               <option disabled={true}>{translations.selectTariff[lang]}</option>
               <option value="perHour">{translations.perHour[lang]}</option>
               <option value="perService">
                 {translations.perService[lang]}
+              </option>
+              <option value="volumeBased">
+                {translations.volumeBased[lang]}
               </option>
             </select>
             {actionData?.errors && actionData.errors.newServicePriceType ? (
@@ -227,7 +252,11 @@ export const action: ActionFunction = async ({
   if (!newServiceTitleRU || typeof newServiceTitleRU !== "string") {
     formValidationErrors.newServiceTitleRU = true;
   }
-  if (!newServicePrice || typeof +newServicePrice !== "number") {
+  if (
+    !newServicePrice ||
+    typeof +newServicePrice !== "number" ||
+    newServicePrice !== "volumeBased"
+  ) {
     formValidationErrors.noNewServicePrice = true;
   }
   if (!categoryToAppendItemIn || typeof categoryToAppendItemIn !== "string") {

@@ -48,11 +48,15 @@ const translations = {
     ru: "Тип расчёта",
     ee: "Arvestuse tüüp",
   },
+  priceVolumeBased: {
+    ru: "От объема",
+    ee: "Sõltub mahust",
+  },
 };
 
 type ContentItemProps = {
   id: string;
-  price: number;
+  price: number | "volumeBased";
   titleRU: string;
   titleEE: string;
   parentId: string;
@@ -79,12 +83,20 @@ const AdminSelectedServiceCategoryContentItem = ({
     <div className="card w-full bg-base-100 card-md shadow-sm">
       <div className="card-body">
         <h2 className="card-title">{lang === "ee" ? titleEE : titleRU}</h2>
-        <p className="text-lg">
-          {translations.price[lang]} {price}
-        </p>
-        <p className="text-lg">
-          {translations.priceType[lang]} : {translations[priceType][lang]}
-        </p>
+        {price === "volumeBased" ? (
+          <p className="text-lg">
+            {translations.price[lang]} {translations.priceVolumeBased[lang]}
+          </p>
+        ) : (
+          <>
+            <p className="text-lg">
+              {translations.price[lang]} {price}
+            </p>
+            <p className="text-lg">
+              {translations.priceType[lang]} : {translations[priceType][lang]}
+            </p>
+          </>
+        )}
 
         <div className="justify-end card-actions">
           <NavLink
@@ -126,7 +138,7 @@ type Props = {
       ru: string;
     };
     content: {
-      price: number;
+      price: number | "volumeBased";
       ee: string;
       ru: string;
       _id: string;

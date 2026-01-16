@@ -356,7 +356,7 @@ export const action: ActionFunction = async ({ params, request }) => {
     await new Promise((r) => {
       setTimeout(() => {
         r("");
-      }, 100);
+      }, 300);
     });
 
     return {

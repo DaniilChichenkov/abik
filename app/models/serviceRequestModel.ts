@@ -18,8 +18,14 @@ const serviceRequestSchema = new mongoose.Schema({
       ee: { type: String, required: true },
     },
     price: {
-      type: Number,
+      type: mongoose.Schema.Types.Mixed,
       required: true,
+      validate: {
+        validator: (v: any) =>
+          typeof v === "number" ||
+          (typeof v === "string" && v === "volumeBased"),
+        message: "Invalid value",
+      },
     },
     priceType: { type: String, required: true },
   },

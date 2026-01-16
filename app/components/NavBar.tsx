@@ -201,9 +201,9 @@ const NavBarMain = () => {
     <nav>
       <div className="navbar flex justify-between items-center bg-base-100 shadow-sm md:px-10 lg:px-20 xl:px-32 2xl:px-64">
         <div className="flex-1">
-          <a className="btn btn-ghost text-xl size-20">
+          <div className="text-xl size-20">
             <img src={logo} alt="logo" className="w-full aspect-square" />
-          </a>
+          </div>
         </div>
 
         {/* Mobile navigation + lang selection menu */}

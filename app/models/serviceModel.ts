@@ -10,7 +10,14 @@ const serviceSchema = new mongoose.Schema({
   //Children (Content) as array
   content: [
     {
-      price: { type: Number, required: true },
+      price: {
+        type: mongoose.Schema.Types.Mixed,
+        required: true,
+        validate: {
+          validator: (v: any) => typeof v === "number" || v === "volumeBased",
+          message: "Invalid value",
+        },
+      },
       ee: { type: String, required: true },
       ru: { type: String, required: true },
       priceType: { type: String, required: true },

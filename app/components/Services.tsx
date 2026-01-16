@@ -95,6 +95,10 @@ const translations = {
     ru: "За всю услугу",
     ee: "Kogu teenuse eest",
   },
+  priceVolumeBased: {
+    ru: "От объема",
+    ee: "Sõltub mahust",
+  },
 };
 
 const ServicesCategorySelectionButton = ({
@@ -118,7 +122,7 @@ const ServicesCategorySelectionButton = ({
     <NavLink
       to={handleNavigation()}
       preventScrollReset
-      className={`btn 2xl:btn-lg ${active && "btn-primary"}`}
+      className={`btn h-full overflow-scroll 2xl:btn-lg ${active && "btn-primary"}`}
     >
       {content}
     </NavLink>
@@ -133,7 +137,7 @@ const ServiceItem = ({
   priceType,
 }: {
   title: string;
-  price: number;
+  price: number | "volumeBased";
   _id: string;
   contactInfo: {
     tel: string;
@@ -174,11 +178,22 @@ const ServiceItem = ({
               <span className="font-normal">{title}</span>
             </p>
             <p className="font-bold text-lg">
-              {translations.price[lang]}:{" "}
-              <span className="font-normal">{price}&#8364;</span>
-              <span className="underline font-normal ml-1">
-                {translations[priceType][lang]}
-              </span>
+              {price === "volumeBased" ? (
+                <>
+                  {translations.price[lang]}:
+                  <span className="underline font-normal ml-1">
+                    {translations.priceVolumeBased[lang]}
+                  </span>
+                </>
+              ) : (
+                <>
+                  {translations.price[lang]}:{" "}
+                  <span className="font-normal">{price}&#8364;</span>
+                  <span className="underline font-normal ml-1">
+                    {translations[priceType][lang]}
+                  </span>
+                </>
+              )}
             </p>
           </div>
         </div>
@@ -313,11 +328,22 @@ const ServiceItem = ({
                   <span className="font-normal">{title}</span>
                 </p>
                 <p className="font-bold text-lg">
-                  {translations.price[lang]}:{" "}
-                  <span className="font-normal">{price}&#8364;</span>
-                  <span className="underline font-normal ml-1">
-                    {translations[priceType][lang]}
-                  </span>
+                  {price === "volumeBased" ? (
+                    <>
+                      {translations.price[lang]}:
+                      <span className="underline font-normal ml-1">
+                        {translations.priceVolumeBased[lang]}
+                      </span>
+                    </>
+                  ) : (
+                    <>
+                      {translations.price[lang]}:{" "}
+                      <span className="font-normal">{price}&#8364;</span>
+                      <span className="underline font-normal ml-1">
+                        {translations[priceType][lang]}
+                      </span>
+                    </>
+                  )}
                 </p>
               </div>
 
@@ -372,11 +398,22 @@ const ServiceItem = ({
       <div className="card-body">
         <h2 className="card-title text-2xl font-bold 2xl:text-3xl">{title}</h2>
         <p className="text-lg">
-          {translations.price[lang]}:{" "}
-          <span className="font-normal">{price}&#8364;</span>
-          <span className="underline font-normal ml-1">
-            {translations[priceType][lang]}
-          </span>
+          {price === "volumeBased" ? (
+            <>
+              {translations.price[lang]}:
+              <span className="underline font-normal ml-1">
+                {translations.priceVolumeBased[lang]}
+              </span>
+            </>
+          ) : (
+            <>
+              {translations.price[lang]}:{" "}
+              <span className="font-normal">{price}&#8364;</span>
+              <span className="underline font-normal ml-1">
+                {translations[priceType][lang]}
+              </span>
+            </>
+          )}
         </p>
         <div className="card-actions justify-end">
           <button
@@ -393,7 +430,7 @@ const ServiceItem = ({
 
 type Props = {
   selectedServiceContent: {
-    price: number;
+    price: number | "volumeBased";
     ee: string;
     ru: string;
     _id: string;

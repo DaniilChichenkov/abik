@@ -42,6 +42,10 @@ const translations = {
     ru: "За всю услугу",
     ee: "Kogu teenuse eest",
   },
+  volumeBased: {
+    ru: "От объема",
+    ee: "Sõltub mahust",
+  },
   priceType: {
     ru: "Тип расчёта",
     ee: "Arvestuse tüüp",
@@ -54,7 +58,7 @@ const translations = {
 
 type Props = {
   loaderData: {
-    price: number;
+    price: number | "volumeBased";
     ee: string;
     ru: string;
     _id: string;
@@ -83,6 +87,10 @@ const AdminSelectedServiceCategoryContentItemChange = ({
   //Get language
   const [searchParams] = useSearchParams();
   const lang = searchParams.get("lang") as "ee" | "ru";
+
+  //Track selected tariff and if "volumeBased" selected - hide price input
+  const [isVolumeBasedTariffSelected, setIsVolumeBasedTariffSelected] =
+    useState<null | boolean>(null);
 
   return (
     <article className="mt-10">
@@ -133,16 +141,28 @@ const AdminSelectedServiceCategoryContentItemChange = ({
 
             {/* New service price */}
             <fieldset className="fieldset">
-              <legend className="fieldset-legend">
+              <legend
+                className={`${(isVolumeBasedTariffSelected === null && loaderData.price === "volumeBased") || isVolumeBasedTariffSelected ? "hidden" : ""} fieldset-legend`}
+              >
                 {translations.newServicePrice[lang]}
               </legend>
               <input
                 name="newServicePrice"
-                type="string"
+                type={
+                  (isVolumeBasedTariffSelected === null &&
+                    loaderData.price === "volumeBased") ||
+                  isVolumeBasedTariffSelected
+                    ? "hidden"
+                    : "text"
+                }
                 className={`input ${actionData?.errors && actionData.errors.duplicatedFieldRU && "input-error"}`}
                 placeholder={translations.typeHere[lang]}
                 value={servicePrice}
-                onChange={(e) => setServicePrice(e.target.value)}
+                onChange={(e) => {
+                  if (!isVolumeBasedTariffSelected) {
+                    setServicePrice(e.target.value);
+                  }
+                }}
                 required
               />
             </fieldset>
@@ -158,6 +178,15 @@ const AdminSelectedServiceCategoryContentItemChange = ({
                 defaultValue={loaderData.priceType}
                 className="select"
                 required
+                onChange={(e) => {
+                  if (e.target.value === "volumeBased") {
+                    setIsVolumeBasedTariffSelected(true);
+                    setServicePrice("volumeBased");
+                  } else {
+                    setIsVolumeBasedTariffSelected(false);
+                    setServicePrice("");
+                  }
+                }}
               >
                 <option disabled={true}>
                   {translations.selectTariff[lang]}
@@ -165,6 +194,9 @@ const AdminSelectedServiceCategoryContentItemChange = ({
                 <option value="perHour">{translations.perHour[lang]}</option>
                 <option value="perService">
                   {translations.perService[lang]}
+                </option>
+                <option value="volumeBased">
+                  {translations.volumeBased[lang]}
                 </option>
               </select>
               {actionData?.errors && actionData.errors.newServicePriceType ? (
