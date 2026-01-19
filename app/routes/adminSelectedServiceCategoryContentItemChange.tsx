@@ -82,12 +82,10 @@ const AdminSelectedServiceCategoryContentItemChange = ({
   loaderData,
   actionData,
 }: Props) => {
-  const navigate = useNavigate();
-
   const [serviceTitleEE, setServiceTitleEE] = useState<string>(loaderData.ee);
   const [serviceTitleRU, setServiceTitleRU] = useState<string>(loaderData.ru);
   const [servicePrice, setServicePrice] = useState<string>(
-    String(loaderData.price)
+    String(loaderData.price),
   );
 
   const location = useLocation();
@@ -174,7 +172,7 @@ const AdminSelectedServiceCategoryContentItemChange = ({
                     loaderData.price === "volumeBased") ||
                   isVolumeBasedTariffSelected
                     ? "hidden"
-                    : "text"
+                    : "number"
                 }
                 className={`input ${actionData?.errors && actionData.errors.duplicatedFieldRU && "input-error"}`}
                 placeholder={translations.typeHere[lang]}
@@ -243,7 +241,7 @@ const AdminSelectedServiceCategoryContentItemChange = ({
                     onClick={(e) => {
                       e.preventDefault();
                       setAdditionalInfoInputLanguageDropdownOpen(
-                        (prev) => !prev
+                        (prev) => !prev,
                       );
                     }}
                     className="btn m-1"
@@ -366,7 +364,7 @@ export const loader: LoaderFunction = async ({
     }
 
     const serviceItemData = serviceItem.content.filter(
-      (item) => item._id.toString() === selectedServiceCategoryItem
+      (item) => item._id.toString() === selectedServiceCategoryItem,
     );
 
     if (!serviceItemData.length) {
@@ -468,7 +466,7 @@ export const action: ActionFunction = async ({
           "content.$.additionalInfo.ee": newServiceAdditionalInfoEE,
           "content.$.additionalInfo.ru": newServiceAdditionalInfoRU,
         },
-      }
+      },
     );
 
     const url = new URL(request.url);

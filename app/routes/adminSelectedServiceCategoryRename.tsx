@@ -3,6 +3,8 @@ import {
   redirect,
   useLocation,
   useNavigate,
+  useSearchParams,
+  NavLink,
   type ActionFunction,
   type ActionFunctionArgs,
   type LoaderFunction,
@@ -11,6 +13,25 @@ import {
 import { useState } from "react";
 
 import { X } from "lucide-react";
+
+const translations = {
+  changeTitle: {
+    ru: "Изменить заголовок",
+    ee: "Muuda pealkirja",
+  },
+  typeHere: {
+    ru: "Введите здесь",
+    ee: "Sisestage siia",
+  },
+  categoryNameTaken: {
+    ru: "Название категории уже занято",
+    ee: "Kategooria nimi on juba kasutusel",
+  },
+  confirm: {
+    ru: "Подтвердить",
+    ee: "Kinnita",
+  },
+};
 
 type Props = {
   loaderData: {
@@ -32,37 +53,45 @@ const AdminSelectedCategoryRename = ({ loaderData, actionData }: Props) => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  //Get language
+  const [searchParams] = useSearchParams();
+  const lang = searchParams.get("lang") as "ee" | "ru";
+
   return (
     <div className="card bg-base-100 shadow-md w-full md:w-[20rem] mt-5 relative">
       <div className="card-body w-full">
         <Form method="POST" action={`.${location.search}`}>
           {/* New name est */}
           <fieldset className="fieldset">
-            <legend className="fieldset-legend">Change title (est)</legend>
+            <legend className="fieldset-legend">
+              {translations.changeTitle[lang]} (EST)
+            </legend>
             <input
               name="newCategoryNameEE"
               type="text"
               className={`input ${actionData?.errors && actionData.errors.duplicatedFieldEE && "input-error"}`}
-              placeholder="Type here"
+              placeholder={translations.typeHere[lang]}
               value={categoryNameEE}
               onChange={(e) => setCategoryNameEE(e.target.value)}
               required
             />
             {actionData?.errors && actionData.errors.duplicatedFieldEE ? (
               <p className="label text-red-500">
-                Category name is already taken
+                {translations.categoryNameTaken[lang]}
               </p>
             ) : null}
           </fieldset>
 
           {/* New name rus */}
           <fieldset className="fieldset">
-            <legend className="fieldset-legend">Change title (rus)</legend>
+            <legend className="fieldset-legend">
+              {translations.changeTitle[lang]} (RUS)
+            </legend>
             <input
               name="newCategoryNameRU"
               type="text"
               className={`input ${actionData?.errors && actionData.errors.duplicatedFieldRU && "input-error"}`}
-              placeholder="Type here"
+              placeholder={translations.typeHere[lang]}
               value={categoryNameRU}
               onChange={(e) => setCategoryNameRU(e.target.value)}
               required
@@ -78,18 +107,20 @@ const AdminSelectedCategoryRename = ({ loaderData, actionData }: Props) => {
           <input type="hidden" name="categoryId" value={loaderData._id} />
 
           <div className="justify-end card-actions mt-5">
-            <button className="btn btn-primary">Confirm</button>
+            <button className="btn btn-primary">
+              {translations.confirm[lang]}
+            </button>
           </div>
         </Form>
       </div>
 
       {/* Close form button */}
-      <button
-        onClick={() => navigate(-1)}
+      <NavLink
+        to={`/admin/services/${loaderData._id}?${searchParams.toString()}`}
         className="absolute top-0 right-0 btn btn-error text-white btn-sm"
       >
         <X />
-      </button>
+      </NavLink>
     </div>
   );
 };
@@ -116,7 +147,7 @@ export const loader: LoaderFunction = async ({
       {
         _id: new mongoose.Types.ObjectId(selectedServiceCategory),
       },
-      { __v: 0, content: 0 }
+      { __v: 0, content: 0 },
     ).lean();
 
     if (!serviceCategory) {
@@ -179,7 +210,7 @@ export const action: ActionFunction = async ({
           ee: newCategoryNameEE,
           ru: newCategoryNameRU,
         },
-      }
+      },
     );
 
     const url = new URL(request.url);

@@ -126,9 +126,9 @@ const ServicesCategorySelectionButton = ({
     <NavLink
       to={handleNavigation()}
       preventScrollReset
-      className={`btn h-full overflow-scroll 2xl:btn-lg ${active && "btn-primary"}`}
+      className={`btn h-full 2xl:btn-lg ${active && "btn-primary"}`}
     >
-      <p className="py-2">{content}</p>
+      <p className="py-2">{content && content.trim()}</p>
     </NavLink>
   );
 };
@@ -310,7 +310,7 @@ const ServiceItem = ({
             )}
           </fetcher.Form>
         </div>
-      </>
+      </>,
     );
     openModal();
   };
@@ -382,7 +382,7 @@ const ServiceItem = ({
                 </p>
               </div>
             </div>
-          </>
+          </>,
         );
       } else {
         setInnerContent(
@@ -407,7 +407,7 @@ const ServiceItem = ({
                 </p>
               </div>
             </div>
-          </>
+          </>,
         );
       }
     }

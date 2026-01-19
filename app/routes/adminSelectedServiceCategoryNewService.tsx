@@ -166,7 +166,7 @@ const AdminSelectedServiceCategoryNewService = ({
             </legend>
             <input
               name="newServicePrice"
-              type={isVolumeBasedTariffSelected ? "hidden" : "string"}
+              type={isVolumeBasedTariffSelected ? "hidden" : "number"}
               className={`input ${actionData?.errors && actionData.errors.duplicatedFieldRU && "input-error"}`}
               placeholder={translations.typeHere[lang]}
               value={servicePrice}
@@ -393,7 +393,7 @@ export const action: ActionFunction = async ({
             },
           },
         },
-      }
+      },
     );
 
     const url = new URL(request.url);
