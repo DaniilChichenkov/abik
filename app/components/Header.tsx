@@ -42,7 +42,7 @@ const Header = () => {
       <img
         alt=""
         src={headerImage}
-        className="h-56 w-full object-cover sm:h-full"
+        className="h-full w-full object-cover md:object-contain"
       />
     </section>
   );
