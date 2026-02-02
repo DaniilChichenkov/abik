@@ -1,10 +1,10 @@
 import { useSearchParams } from "react-router";
-import headerImage from "../assets/headerImage.jpg";
+import headerImage from "../assets/header.png";
 
 const translations = {
   header: {
-    ru: "Выполняем свою работу качественно, ответственно и добросовестно",
-    ee: "Teeme oma tööd kvaliteetselt, vastutustundlikult ja kohusetundlikult",
+    ru: "Бытовые услуги, обслуживание и ремонт в Ида-Вирумаа для квартирных товариществ и частных лиц",
+    ee: "Koduteenused, hooldus ja remont Ida-Viru maakonnas korteriühistutele ja eraisikutele",
   },
   cta: {
     ru: "Ознакомиться с услугами",
@@ -20,9 +20,9 @@ const Header = () => {
     <section className="overflow-hidden bg-gray-50 sm:grid sm:grid-cols-2">
       <div className="p-8 md:p-12 lg:px-16 lg:py-24">
         <div className="mx-auto max-w-xl text-center ltr:sm:text-left rtl:sm:text-right">
-          <h2 className="text-2xl font-bold text-gray-900 md:text-3xl xl:text-5xl 2xl:text-7xl">
+          <h1 className="text-2xl font-bold text-gray-900 md:text-3xl xl:text-5xl 2xl:text-7xl">
             {translations.header[lang]}
-          </h2>
+          </h1>
 
           <div className="mt-4 md:mt-8">
             <button
@@ -31,7 +31,7 @@ const Header = () => {
                   behavior: "smooth",
                 });
               }}
-              className="btn btn-primary lg:btn-lg xl:btn-xl"
+              className="btn btn-xl btn-primary lg:btn-xl"
             >
               {translations.cta[lang]}
             </button>

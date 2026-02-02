@@ -30,9 +30,9 @@ const GalleryCategorySelectionButton = ({
     <NavLink
       to={handleNavigation()}
       preventScrollReset
-      className={`btn h-full 2xl:btn-lg ${active && "btn-primary"}`}
+      className={`btn h-full 2xl:btn-lg border-dashed border-blue-600 border-2 ${active && "btn-primary border-none"}`}
     >
-      <p className="py-2">{content && content.trim()}</p>
+      <p className="py-2 lg:py-5 lg:text-xl">{content && content.trim()}</p>
     </NavLink>
   );
 };

@@ -4,7 +4,6 @@ import type {
   MetaFunction,
 } from "react-router";
 import { redirect, useLocation } from "react-router";
-import type { Route } from "./+types/home";
 
 import { Header, Services, Gallery, FeedBack } from "~/components";
 import { useEffect } from "react";
@@ -20,13 +19,13 @@ export const meta: MetaFunction = ({ location }) => {
 
   const title =
     lang === "ru"
-      ? "Бытовые услуги и ремонт | Abik"
-      : "Koduteenused ja hooldustööd | Abik";
+      ? "Бытовые услуги и ремонт в Ида-Вирумаа | Abik"
+      : "Koduteenused ja hooldustööd Ida-Viru maakonnas | Abik";
 
   const description =
     lang === "ru"
-      ? "Уборка снега, покос травы, сантехник, электрик, ремонт мебели и окон, уборка и вывоз мусора. Узнайте цену и оставьте заявку."
-      : "Lume koristus, muru niitmine, torutööd, elekter, mööbliremont, akende remont, koristus ja jäätmete äravedu. Küsi hinda ja jäta päring.";
+      ? "Бытовые услуги и ремонт в Ида-Вирумаа: сантехник, электрик, уборка, вывоз мусора, покос травы, уборка снега, ремонт мебели и окон. Быстрый расчёт цены и заявка онлайн."
+      : "Koduteenused ja hooldustööd Ida-Viru maakonnas: torutööd, elekter, koristus, jäätmete äravedu, muru niitmine, lume koristus, mööbliremont ja akende remont. Kiire hinnapäring ja tellimus veebis.";
 
   return [
     { title },
@@ -70,6 +69,8 @@ type Props = {
       _id: string;
       priceType: "perHour" | "perService";
       additionalInfo: string;
+      colorOfButton?: string;
+      pathToIcon?: string;
     }[];
     otherServiceCategoriesContentForClient: {
       _id: string;
@@ -332,7 +333,7 @@ export const loader: LoaderFunction = async ({
       //Find selected service category content
       const selectedServiceCategoryContent = await ServiceModel.findOne(
         { _id: String(serviceCategory) },
-        { content: 1 }
+        { content: 1 },
       ).lean();
       if (selectedServiceCategoryContent) {
         const selectedServiceCategoryContentWithStringIds =
@@ -347,14 +348,14 @@ export const loader: LoaderFunction = async ({
       //Find other categories
       const serviceCategories = await ServiceModel.find(
         {},
-        { title: 1, _id: 1 }
+        { title: 1, _id: 1 },
       ).lean();
       if (serviceCategories.length) {
         const serviceCategoriesWithStringIds = serviceCategories.map(
           (item) => ({
             ...item,
             _id: item._id.toString(),
-          })
+          }),
         );
         otherServiceCategoriesContentForClient =
           serviceCategoriesWithStringIds as any;
@@ -380,7 +381,7 @@ export const loader: LoaderFunction = async ({
       //Get selected gallery
       const selectedGallery = await GalleryModel.findOne(
         { _id: String(galleryCategory) },
-        { _id: 1 }
+        { _id: 1 },
       ).lean();
 
       if (selectedGallery) {
@@ -391,13 +392,13 @@ export const loader: LoaderFunction = async ({
           process.cwd(),
           "public",
           "gallery",
-          selectedGalleryStringId
+          selectedGalleryStringId,
         );
 
         //Read directory
         const entries = await fs.readdir(pathToGallery);
         const filePaths = entries.map((item) =>
-          path.join("gallery", selectedGalleryStringId, item)
+          path.join("gallery", selectedGalleryStringId, item),
         );
         selectedGalleryContentForClient = filePaths;
       }

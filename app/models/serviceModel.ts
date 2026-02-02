@@ -25,6 +25,16 @@ const serviceSchema = new mongoose.Schema({
         ru: { type: String },
         ee: { type: String },
       },
+      colorOfButton: {
+        type: String,
+      },
+      pathToIcon: {
+        type: String,
+      },
+      id: {
+        type: String,
+        required: true,
+      },
     },
   ],
 });

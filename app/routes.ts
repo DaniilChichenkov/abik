@@ -59,15 +59,15 @@ export default [
             //Delete service in category
             route(
               ":itemId/delete",
-              "./routes/adminSelectedServiceCategoryContentItemDelete.ts"
+              "./routes/adminSelectedServiceCategoryContentItemDelete.ts",
             ),
-          ]
+          ],
         ),
 
         //Rename selected service item
         route(
           ":selectedServiceCategory/:selectedServiceCategoryItem/change",
-          "./routes/adminSelectedServiceCategoryContentItemChange.tsx"
+          "./routes/adminSelectedServiceCategoryContentItemChange.tsx",
         ),
       ]),
 
@@ -90,9 +90,9 @@ export default [
             //Delete image from category
             route(
               ":image/delete",
-              "./routes/adminSelectedGalleryCategoryDeleteImage.ts"
+              "./routes/adminSelectedGalleryCategoryDeleteImage.ts",
             ),
-          ]
+          ],
         ),
       ]),
 

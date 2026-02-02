@@ -1,4 +1,7 @@
 import { useEffect, useRef } from "react";
+
+import testImage from "../assets/service.png";
+
 import {
   Form,
   NavLink,
@@ -126,9 +129,9 @@ const ServicesCategorySelectionButton = ({
     <NavLink
       to={handleNavigation()}
       preventScrollReset
-      className={`btn h-full 2xl:btn-lg ${active && "btn-primary"}`}
+      className={`btn h-full 2xl:btn-lg border-dashed border-blue-600 border-2 ${active && "btn-primary border-none"}`}
     >
-      <p className="py-2">{content && content.trim()}</p>
+      <p className="py-2 lg:py-5 lg:text-xl">{content && content.trim()}</p>
     </NavLink>
   );
 };
@@ -140,6 +143,8 @@ const ServiceItem = ({
   contactInfo,
   priceType,
   additionalInfo,
+  colorOfButton,
+  pathToIcon,
 }: {
   title: string;
   price: number | "volumeBased";
@@ -154,6 +159,8 @@ const ServiceItem = ({
     ru: string;
     ee: string;
   };
+  colorOfButton?: string;
+  pathToIcon?: string;
 }) => {
   const openModal = useClientModalStore((state) => state.openModal);
   const closeModal = useClientModalStore((state) => state.closeModal);
@@ -414,40 +421,70 @@ const ServiceItem = ({
   }, [fetcher.data]);
 
   return (
-    <div className="card card-border bg-base-100 w-full h-full overflow-scroll">
+    <div className="card card-border border-black border-2 bg-base-100 w-full h-full overflow-scroll">
       <div className="card-body">
-        <h2 className="card-title text-2xl font-bold 2xl:text-3xl">{title}</h2>
-        <p className="text-lg">
-          {price === "volumeBased" ? (
-            <>
-              {translations.price[lang]}:
-              <span className="underline font-normal ml-1">
-                {translations.priceVolumeBased[lang]}
-              </span>
-            </>
-          ) : (
-            <>
-              {translations.price[lang]}:{" "}
-              <span className="font-normal">{price}&#8364;</span>
-              <span className="underline font-normal ml-1">
-                {translations[priceType][lang]}
-              </span>
-            </>
-          )}
-        </p>
-        {/* Additional info about service */}
-        <p className="whitespace-pre-wrap">
-          {additionalInfo && additionalInfo[lang] && additionalInfo[lang]}
-        </p>
+        {/* Title and image container */}
+        <div className="w-full grid grid-cols-3 relative">
+          {/* Title */}
+          <h2 className="col-span-2 card-title text-2xl font-bold 2xl:text-3xl">
+            {title}
+          </h2>
+
+          {/* Image */}
+          {pathToIcon ? (
+            <img
+              src={`services/${pathToIcon}`}
+              alt="Service image"
+              className="size-32 absolute right-0"
+            />
+          ) : null}
+        </div>
+        <div className="w-full grid grid-cols-3">
+          <p className="text-lg col-span-2">
+            {price === "volumeBased" ? (
+              <>
+                {translations.price[lang]}:
+                <span className="underline font-normal ml-1">
+                  {translations.priceVolumeBased[lang]}
+                </span>
+              </>
+            ) : (
+              <>
+                {translations.price[lang]}:{" "}
+                <span className="font-normal">{price}&#8364;</span>
+                <span className="underline font-normal ml-1">
+                  {translations[priceType][lang]}
+                </span>
+              </>
+            )}
+          </p>
+          {/* Additional info about service */}
+          <p className="whitespace-pre-wrap col-span-2">
+            {additionalInfo && additionalInfo[lang] && additionalInfo[lang]}
+          </p>
+        </div>
 
         {/* Make a request button */}
-        <div className="card-actions justify-end">
-          <button
-            onClick={() => handleServiceRequest(_id)}
-            className="btn btn-primary 2xl:btn-lg"
-          >
-            {translations.makeRequest[lang]}
-          </button>
+        <div className="card-actions justify-start">
+          {/* If color = 000000 -> Render default button
+              If not -> Custom one
+          */}
+          {colorOfButton === "#000000" ? (
+            <button
+              onClick={() => handleServiceRequest(_id)}
+              className="btn btn-primary 2xl:btn-lg"
+            >
+              {translations.makeRequest[lang]}
+            </button>
+          ) : (
+            <button
+              onClick={() => handleServiceRequest(_id)}
+              style={{ backgroundColor: colorOfButton }}
+              className="btn text-white 2xl:btn-lg"
+            >
+              {translations.makeRequest[lang]}
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -465,6 +502,8 @@ type Props = {
       ru: string;
       ee: string;
     };
+    pathToIcon?: string;
+    colorOfButton?: string;
   }[];
   otherServicesCategories: {
     _id: string;
@@ -498,7 +537,7 @@ const Services = ({
               </h2>
 
               {/* Services Selection */}
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-1 gap-x-4 gap-y-4 mt-5">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-1 gap-x-4 gap-y-8 mt-5">
                 {otherServicesCategories.map((item) => (
                   <ServicesCategorySelectionButton
                     content={item.title[lang]}
@@ -522,6 +561,8 @@ const Services = ({
                 contactInfo={contactInfo}
                 priceType={item.priceType}
                 additionalInfo={item.additionalInfo}
+                colorOfButton={item.colorOfButton}
+                pathToIcon={item.pathToIcon}
               />
             ))}
           </div>

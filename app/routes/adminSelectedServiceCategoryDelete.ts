@@ -4,6 +4,9 @@ import {
   type ActionFunctionArgs,
 } from "react-router";
 
+import path from "path";
+import fs from "fs/promises";
+
 export const action: ActionFunction = async ({
   request,
 }: ActionFunctionArgs) => {
@@ -32,9 +35,26 @@ export const action: ActionFunction = async ({
 
   try {
     await connectToDB();
-    await ServiceModel.deleteOne({
-      _id: new mongoose.Types.ObjectId(itemId as string),
-    });
+    const deletedCategory = await ServiceModel.findOneAndDelete(
+      {
+        _id: new mongoose.Types.ObjectId(itemId as string),
+      },
+      {
+        new: true,
+      },
+    );
+
+    //Remove folder with icons for this category
+    if (deletedCategory) {
+      const pathToFolder = path.join(
+        process.cwd(),
+        "public",
+        "services",
+        deletedCategory._id.toString(),
+      );
+      await fs.rm(pathToFolder, { recursive: true, force: true });
+    }
+
     return {
       ok: true,
     };

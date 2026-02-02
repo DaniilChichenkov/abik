@@ -1,5 +1,8 @@
 import type { ActionFunction } from "react-router";
 
+import path from "path";
+import fs from "fs/promises";
+
 export const action: ActionFunction = async ({ request, params }) => {
   //Import DB modules
   const { connectToDB } = await import("~/utils/db");
@@ -27,7 +30,9 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   try {
     await connectToDB();
-    await ServiceModel.updateOne(
+
+    //Remove record from db
+    const changedRecord = await ServiceModel.findOneAndUpdate(
       {
         _id: new mongoose.Types.ObjectId(selectedServiceCategory as string),
       },
@@ -35,8 +40,37 @@ export const action: ActionFunction = async ({ request, params }) => {
         $pull: {
           content: { _id: new mongoose.Types.ObjectId(itemId) },
         },
-      }
+      },
+      {
+        new: false,
+        runValidators: true,
+      },
     );
+
+    //Find item by id (Which was removed)
+    if (changedRecord) {
+      const removedItem = changedRecord.content.find(
+        (item) => item._id.toString() === itemId,
+      );
+
+      if (
+        removedItem &&
+        removedItem.pathToIcon &&
+        removedItem.pathToIcon.length > 0
+      ) {
+        //Get path to file
+        const pathToFile = path.join(
+          process.cwd(),
+          "public",
+          "services",
+          removedItem.pathToIcon,
+        );
+
+        //Remove file
+        await fs.unlink(pathToFile);
+      }
+    }
+
     return {
       ok: true,
     };

@@ -117,7 +117,7 @@ const AdminSelectedServiceCategoryContentItem = ({
               //Set id of item on which action will be performed
               setItemId(id);
               setActionRoute(
-                `/admin/services/${parentId}/${id}/delete${location.search}`
+                `/admin/services/${parentId}/${id}/delete${location.search}`,
               );
             }}
             className="btn btn-error text-white"
@@ -168,13 +168,16 @@ const AdminSelectedServiceCategory = ({ loaderData }: Props) => {
       {/* Header */}
       <header className="flex flex-col items-start">
         {/* Category name and settings */}
-        <div className="flex items-center gap-x-2 text-xl">
+        <div className="flex flex-wrap items-center gap-x-2 text-xl">
           <span className="font-semibold">
             {translations.selectedCategory[lang]}
           </span>{" "}
           {loaderData.title[lang]}
           {/* Settings of a selected category */}
-          <details ref={settingsDropdownRef} className="dropdown dropdown-end">
+          <details
+            ref={settingsDropdownRef}
+            className="dropdown dropdown-start sm:dropdown-end"
+          >
             <summary className="btn m-1">
               <Settings />
             </summary>
@@ -201,7 +204,7 @@ const AdminSelectedServiceCategory = ({ loaderData }: Props) => {
                     //Set id of item on which action will be performed
                     setItemId(loaderData._id);
                     setActionRoute(
-                      `/admin/services/${loaderData._id}/delete${search}`
+                      `/admin/services/${loaderData._id}/delete${search}`,
                     );
                   }}
                   className="flex justify-between items-center w-full text-error"
@@ -279,7 +282,7 @@ export const loader: LoaderFunction = async ({
       {
         _id: new mongoose.Types.ObjectId(selectedServiceCategory),
       },
-      { __v: 0 }
+      { __v: 0 },
     ).lean();
 
     if (!serviceCategory) {
