@@ -20,7 +20,9 @@ const Header = () => {
     <section className="overflow-hidden bg-gray-50 sm:grid sm:grid-cols-2">
       <div className="p-8 md:p-8 lg:px-16 lg:py-12 h-full">
         <div className="mx-auto max-w-xl text-center ltr:sm:text-left rtl:sm:text-right h-full flex flex-col justify-center">
-          <h1 className="text-2xl font-bold text-gray-900 md:text-3xl xl:text-5xl 2xl:text-7xl">
+          <h1
+            className={`text-2xl font-bold text-gray-900 ${lang === "ee" ? "md:text-2xl lg:text-3xl xl:text-5xl 2xl:text-6xl" : "md:text-xl lg:text-3xl xl:text-3xl 2xl:text-5xl"}`}
+          >
             {translations.header[lang]}
           </h1>
 
@@ -31,7 +33,7 @@ const Header = () => {
                   behavior: "smooth",
                 });
               }}
-              className="btn btn-xl btn-primary lg:btn-xl"
+              className="btn btn-lg btn-primary lg:btn-xl"
             >
               {translations.cta[lang]}
             </button>
