@@ -18,8 +18,8 @@ const Header = () => {
 
   return (
     <section className="overflow-hidden bg-gray-50 sm:grid sm:grid-cols-2">
-      <div className="p-8 md:p-12 lg:px-16 lg:py-24">
-        <div className="mx-auto max-w-xl text-center ltr:sm:text-left rtl:sm:text-right">
+      <div className="p-8 md:p-8 lg:px-16 lg:py-12 h-full">
+        <div className="mx-auto max-w-xl text-center ltr:sm:text-left rtl:sm:text-right h-full flex flex-col justify-center">
           <h1 className="text-2xl font-bold text-gray-900 md:text-3xl xl:text-5xl 2xl:text-7xl">
             {translations.header[lang]}
           </h1>
