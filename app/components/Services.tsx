@@ -421,73 +421,75 @@ const ServiceItem = ({
   }, [fetcher.data]);
 
   return (
-    <div className="card card-border border-black border-2 bg-base-100 w-full h-full overflow-scroll">
-      <div className="card-body">
-        {/* Title and image container */}
-        <div className="w-full grid grid-cols-3 relative">
-          {/* Title */}
-          <h2 className="col-span-2 card-title text-2xl font-bold 2xl:text-3xl">
-            {title}
-          </h2>
+    <>
+      <div className="card card-border border-black border-2 bg-base-100 w-full h-full overflow-scroll">
+        <div className="card-body">
+          {/* Title and image container */}
+          <div className="w-full grid grid-cols-3 relative z-0">
+            {/* Title */}
+            <h2 className="col-span-2 card-title text-2xl font-bold 2xl:text-3xl z-50">
+              {title}
+            </h2>
 
-          {/* Image */}
-          {pathToIcon ? (
-            <img
-              src={`services/${pathToIcon}`}
-              alt="Service image"
-              className="size-32 absolute right-0"
-            />
-          ) : null}
-        </div>
-        <div className="w-full grid grid-cols-3">
-          <p className="text-lg col-span-2">
-            {price === "volumeBased" ? (
-              <>
-                {translations.price[lang]}:
-                <span className="underline font-normal ml-1">
-                  {translations.priceVolumeBased[lang]}
-                </span>
-              </>
-            ) : (
-              <>
-                {translations.price[lang]}:{" "}
-                <span className="font-normal">{price}&#8364;</span>
-                <span className="underline font-normal ml-1">
-                  {translations[priceType][lang]}
-                </span>
-              </>
-            )}
-          </p>
-          {/* Additional info about service */}
-          <p className="whitespace-pre-wrap col-span-2">
-            {additionalInfo && additionalInfo[lang] && additionalInfo[lang]}
-          </p>
-        </div>
+            {/* Image */}
+            {pathToIcon ? (
+              <img
+                src={`services/${pathToIcon}`}
+                alt="Service image"
+                className="size-32 absolute right-0 z-0"
+              />
+            ) : null}
+          </div>
+          <div className="w-full grid grid-cols-3 z-50">
+            <p className="text-lg col-span-2">
+              {price === "volumeBased" ? (
+                <>
+                  {translations.price[lang]}:
+                  <span className="underline font-normal ml-1">
+                    {translations.priceVolumeBased[lang]}
+                  </span>
+                </>
+              ) : (
+                <>
+                  {translations.price[lang]}:{" "}
+                  <span className="font-normal">{price}&#8364;</span>
+                  <span className="underline font-normal ml-1">
+                    {translations[priceType][lang]}
+                  </span>
+                </>
+              )}
+            </p>
+            {/* Additional info about service */}
+            <p className="whitespace-pre-wrap col-span-2">
+              {additionalInfo && additionalInfo[lang] && additionalInfo[lang]}
+            </p>
+          </div>
 
-        {/* Make a request button */}
-        <div className="card-actions justify-start">
-          {/* If color = 000000 -> Render default button
+          {/* Make a request button */}
+          <div className="card-actions justify-start">
+            {/* If color = 000000 -> Render default button
               If not -> Custom one
           */}
-          {colorOfButton === "#000000" ? (
-            <button
-              onClick={() => handleServiceRequest(_id)}
-              className="btn btn-primary 2xl:btn-lg"
-            >
-              {translations.makeRequest[lang]}
-            </button>
-          ) : (
-            <button
-              onClick={() => handleServiceRequest(_id)}
-              style={{ backgroundColor: colorOfButton }}
-              className="btn text-white 2xl:btn-lg"
-            >
-              {translations.makeRequest[lang]}
-            </button>
-          )}
+            {colorOfButton === "#000000" ? (
+              <button
+                onClick={() => handleServiceRequest(_id)}
+                className="btn btn-primary 2xl:btn-lg"
+              >
+                {translations.makeRequest[lang]}
+              </button>
+            ) : (
+              <button
+                onClick={() => handleServiceRequest(_id)}
+                style={{ backgroundColor: colorOfButton }}
+                className="btn text-white 2xl:btn-lg"
+              >
+                {translations.makeRequest[lang]}
+              </button>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
