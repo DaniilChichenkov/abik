@@ -466,7 +466,7 @@ const ServiceItem = ({
           </div>
 
           {/* Make a request button */}
-          <div className="card-actions justify-start">
+          <div className="card-actions justify-start z-50">
             {/* If color = 000000 -> Render default button
               If not -> Custom one
           */}
