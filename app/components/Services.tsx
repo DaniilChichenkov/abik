@@ -422,7 +422,7 @@ const ServiceItem = ({
 
   return (
     <>
-      <div className="card card-border border-black border-2 bg-base-100 w-full h-full overflow-scroll">
+      <div className="card card-border border-black border-2 bg-base-100 w-full max-h-[20rem] overflow-scroll">
         <div className="card-body">
           {/* Title and image container */}
           <div className="w-full grid grid-cols-3 relative z-0">
