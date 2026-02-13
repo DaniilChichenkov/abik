@@ -33,6 +33,7 @@ const translations = {
 
 //Modal store
 import useAdminModalStore from "~/stores/adminModalStore";
+import { getSession } from "~/utils/session";
 
 type Props = {
   loaderData: {
@@ -99,7 +100,7 @@ const AdminSelectedGalleryCategory = ({ loaderData }: Props) => {
                     //Set id of item on which action will be performed
                     setItemId(loaderData._id);
                     setActionRoute(
-                      `/admin/gallery/${loaderData._id}/delete${search}`
+                      `/admin/gallery/${loaderData._id}/delete${search}`,
                     );
                   }}
                   className="flex justify-between items-center w-full text-error"
@@ -159,7 +160,7 @@ const AdminSelectedGalleryCategory = ({ loaderData }: Props) => {
                           //Set id of item on which action will be performed
                           setItemId(loaderData._id);
                           setActionRoute(
-                            `/admin/gallery/${loaderData._id}/${imageName}/delete${search}`
+                            `/admin/gallery/${loaderData._id}/${imageName}/delete${search}`,
                           );
                         }}
                         className="btn btn-error text-white"
@@ -187,6 +188,15 @@ export const loader: LoaderFunction = async ({
   params,
   request,
 }: LoaderFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   //Import DB modules
   const { connectToDB } = await import("~/utils/db");
   const GalleryModel = (await import("~/models/galleryModel")).default;
@@ -208,7 +218,7 @@ export const loader: LoaderFunction = async ({
       {
         _id: new mongoose.Types.ObjectId(selectedGalleryCategory),
       },
-      { __v: 0 }
+      { __v: 0 },
     ).lean();
 
     if (!galleryCategory) {
@@ -221,13 +231,13 @@ export const loader: LoaderFunction = async ({
       process.cwd(),
       "public",
       "gallery",
-      selectedGalleryCategory
+      selectedGalleryCategory,
     );
     const entires = await fs.readdir(folderPath);
 
     //Build paths for entries
     const entriesWithPaths = entires.map((item) =>
-      path.join("/gallery", selectedGalleryCategory, item)
+      path.join("/gallery", selectedGalleryCategory, item),
     );
 
     return {

@@ -6,10 +6,20 @@ import {
 
 import path from "path";
 import fs from "fs/promises";
+import { getSession } from "~/utils/session";
 
 export const action: ActionFunction = async ({
   request,
 }: ActionFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   //Import DB modules
   const { connectToDB } = await import("~/utils/db");
   const ServiceModel = (await import("~/models/serviceModel")).default;

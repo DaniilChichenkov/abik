@@ -43,6 +43,7 @@ const translations = {
 };
 
 import useAdminModalStore from "~/stores/adminModalStore";
+import { getSession } from "~/utils/session";
 
 type Props = {
   actionData: {
@@ -139,7 +140,7 @@ const AdminSelectedGalleryCategoryNewImages = ({
               </p>
             </>
           )}
-        </>
+        </>,
       );
 
       navigate(-1);
@@ -163,7 +164,7 @@ const AdminSelectedGalleryCategoryNewImages = ({
                 {item}
               </p>
             ))}
-        </>
+        </>,
       );
     }
   }, [actionData]);
@@ -259,6 +260,15 @@ const AdminSelectedGalleryCategoryNewImages = ({
 };
 
 export const action: ActionFunction = async ({ params, request }) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   const { selectedGalleryCategory } = params;
 
   //Check if no gallery provided - redirect to /admin/gallery
@@ -324,7 +334,7 @@ export const action: ActionFunction = async ({ params, request }) => {
     process.cwd(),
     "public",
     "gallery",
-    selectedGalleryCategory
+    selectedGalleryCategory,
   );
 
   //Check if such directory exists

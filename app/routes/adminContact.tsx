@@ -7,8 +7,10 @@ import {
   type ActionFunction,
   type ActionFunctionArgs,
   type LoaderFunction,
+  type LoaderFunctionArgs,
 } from "react-router";
 import { Header } from "~/components/admin/contact";
+import { getSession } from "~/utils/session";
 
 const translations = {
   contactInfo: {
@@ -169,7 +171,18 @@ const AdminContact = ({ loaderData, actionData }: Props) => {
   );
 };
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({
+  request,
+}: LoaderFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   const { connectToDB } = await import("../utils/db");
   const ContactInfoModel = (await import("../models/contactInfoModel")).default;
 
@@ -193,6 +206,15 @@ export const loader: LoaderFunction = async () => {
 export const action: ActionFunction = async ({
   request,
 }: ActionFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   const formData = await request.formData();
   const email = formData.get("contactInfoEmail");
   const tel = formData.get("contactInfoTel");
@@ -239,7 +261,7 @@ export const action: ActionFunction = async ({
         tel,
         email,
         address,
-      }
+      },
     );
     return {
       ok: true,

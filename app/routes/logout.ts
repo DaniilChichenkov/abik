@@ -16,8 +16,6 @@ export const loader: LoaderFunction = async ({
     return redirect("/login");
   }
 
-  console.log("logout route hit");
-
   // Destroy the session
   return redirect("/login", {
     headers: {

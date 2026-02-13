@@ -4,6 +4,7 @@ import {
   type ActionFunction,
   type ActionFunctionArgs,
   type LoaderFunction,
+  type LoaderFunctionArgs,
 } from "react-router";
 import { useState } from "react";
 
@@ -12,6 +13,7 @@ import {
   NewCategoryForm,
   CategorySelectionList,
 } from "~/components/admin/gallery";
+import { getSession } from "~/utils/session";
 
 type Props = {
   actionData?: {
@@ -54,7 +56,18 @@ const AdminGallery = ({ actionData, loaderData }: Props) => {
   );
 };
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({
+  request,
+}: LoaderFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   //Import DB modules
   const { connectToDB } = await import("~/utils/db");
   const GalleryModel = (await import("~/models/galleryModel")).default;
@@ -83,6 +96,15 @@ export const loader: LoaderFunction = async () => {
 export const action: ActionFunction = async ({
   request,
 }: ActionFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   //Import DB modules
   const { connectToDB } = await import("~/utils/db");
   const GalleryModel = (await import("~/models/galleryModel")).default;
@@ -128,7 +150,7 @@ export const action: ActionFunction = async ({
       process.cwd(),
       "public",
       "gallery",
-      createdGallery._id.toString()
+      createdGallery._id.toString(),
     );
     await fs.mkdir(storageFolderPath, { recursive: true });
 

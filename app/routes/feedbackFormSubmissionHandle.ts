@@ -1,4 +1,8 @@
-import type { ActionFunction, ActionFunctionArgs } from "react-router";
+import {
+  redirect,
+  type ActionFunction,
+  type ActionFunctionArgs,
+} from "react-router";
 
 export const action: ActionFunction = async ({
   request,

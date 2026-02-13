@@ -3,10 +3,20 @@ import {
   type ActionFunction,
   type ActionFunctionArgs,
 } from "react-router";
+import { getSession } from "~/utils/session";
 
 export const action: ActionFunction = async ({
   request,
 }: ActionFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   //Import DB modules
   const { connectToDB } = await import("~/utils/db");
   const GalleryModel = (await import("~/models/galleryModel")).default;
@@ -44,7 +54,7 @@ export const action: ActionFunction = async ({
       process.cwd(),
       "public",
       "gallery",
-      String(itemId)
+      String(itemId),
     );
     await fs.rm(folderPath, { recursive: true, force: true });
 

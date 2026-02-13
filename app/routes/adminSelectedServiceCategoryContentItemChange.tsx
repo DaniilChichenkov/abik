@@ -15,6 +15,7 @@ import { fileTypeFromBuffer } from "file-type";
 import { useEffect, useState } from "react";
 import fs from "fs/promises";
 import path from "path";
+import { getSession } from "~/utils/session";
 
 const ALLOWED_MIMES = new Set([
   "image/jpeg",
@@ -621,7 +622,17 @@ const AdminSelectedServiceCategoryContentItemChange = ({
 
 export const loader: LoaderFunction = async ({
   params,
+  request,
 }: LoaderFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   //Import DB modules
   const { connectToDB } = await import("~/utils/db");
   const ServiceModel = (await import("~/models/serviceModel")).default;
@@ -684,6 +695,15 @@ export const loader: LoaderFunction = async ({
 export const action: ActionFunction = async ({
   request,
 }: ActionFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   //Import DB modules
   const { connectToDB } = await import("~/utils/db");
   const ServiceModel = (await import("~/models/serviceModel")).default;

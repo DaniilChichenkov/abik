@@ -1,4 +1,5 @@
 import {
+  redirect,
   useSearchParams,
   type ActionFunction,
   type ActionFunctionArgs,
@@ -6,6 +7,7 @@ import {
   type LoaderFunctionArgs,
 } from "react-router";
 import { Header, RequestsList } from "~/components/admin/requests";
+import { getSession } from "~/utils/session";
 
 const translations = {
   completedRequests: {
@@ -49,7 +51,18 @@ const CompletedRequests = ({ loaderData }: Props) => {
   );
 };
 
-export const loader: LoaderFunction = async ({}: LoaderFunctionArgs) => {
+export const loader: LoaderFunction = async ({
+  request,
+}: LoaderFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   const { connectToDB } = await import("../utils/db");
   const ServiceRequestModel = (await import("../models/serviceRequestModel"))
     .default;
@@ -78,6 +91,15 @@ export const loader: LoaderFunction = async ({}: LoaderFunctionArgs) => {
 export const action: ActionFunction = async ({
   request,
 }: ActionFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   const formData = await request.formData();
   const itemId = formData.get("itemId");
 

@@ -1,9 +1,19 @@
-import type { ActionFunction } from "react-router";
+import { redirect, type ActionFunction } from "react-router";
 
 import path from "path";
 import fs from "fs/promises";
+import { getSession } from "~/utils/session";
 
 export const action: ActionFunction = async ({ request, params }) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   //Import DB modules
   const { connectToDB } = await import("~/utils/db");
   const ServiceModel = (await import("~/models/serviceModel")).default;

@@ -14,6 +14,7 @@ import { Settings, Trash, PencilLine, Plus } from "lucide-react";
 
 //Modal store
 import useAdminModalStore from "~/stores/adminModalStore";
+import { getSession } from "~/utils/session";
 
 const translations = {
   price: {
@@ -263,6 +264,15 @@ export const loader: LoaderFunction = async ({
   request,
   params,
 }: LoaderFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   //Import DB modules
   const { connectToDB } = await import("~/utils/db");
   const ServiceModel = (await import("~/models/serviceModel")).default;

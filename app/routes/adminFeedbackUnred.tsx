@@ -1,11 +1,14 @@
 import {
+  redirect,
   useSearchParams,
   type ActionFunction,
   type ActionFunctionArgs,
   type LoaderFunction,
+  type LoaderFunctionArgs,
 } from "react-router";
 
 import { Header, FeedbackList } from "~/components/admin/feedback";
+import { getSession } from "~/utils/session";
 
 const translations = {
   headerContent: {
@@ -37,7 +40,18 @@ const AdminFeedbackUnred = ({ loaderData }: Props) => {
   );
 };
 
-export const loader: LoaderFunction = async () => {
+export const loader: LoaderFunction = async ({
+  request,
+}: LoaderFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   const FeedbackModel = (await import("../models/feedbackModel")).default;
   const { connectToDB } = await import("../utils/db");
 
@@ -70,6 +84,15 @@ export const loader: LoaderFunction = async () => {
 export const action: ActionFunction = async ({
   request,
 }: ActionFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   //Get form data
   const formData = await request.formData();
   const itemId = formData.get("itemId");
@@ -93,7 +116,7 @@ export const action: ActionFunction = async ({
 
     await FeedbackModel.findOneAndUpdate(
       { _id: new mongoose.Types.ObjectId(itemId) },
-      { red: true }
+      { red: true },
     );
 
     return {

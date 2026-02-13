@@ -13,6 +13,7 @@ import {
 import { useState } from "react";
 
 import { X } from "lucide-react";
+import { getSession } from "~/utils/session";
 
 const translations = {
   changeTitle: {
@@ -126,7 +127,17 @@ const AdminSelectedCategoryRename = ({ loaderData, actionData }: Props) => {
 
 export const loader: LoaderFunction = async ({
   params,
+  request,
 }: LoaderFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   //Import DB modules
   const { connectToDB } = await import("~/utils/db");
   const GalleryModel = (await import("~/models/galleryModel")).default;
@@ -146,7 +157,7 @@ export const loader: LoaderFunction = async ({
       {
         _id: new mongoose.Types.ObjectId(selectedGalleryCategory),
       },
-      { __v: 0, content: 0 }
+      { __v: 0, content: 0 },
     ).lean();
 
     if (!galleryCategory) {
@@ -165,6 +176,15 @@ export const loader: LoaderFunction = async ({
 export const action: ActionFunction = async ({
   request,
 }: ActionFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   //Import DB modules
   const { connectToDB } = await import("~/utils/db");
   const GalleryModel = (await import("~/models/galleryModel")).default;
@@ -209,7 +229,7 @@ export const action: ActionFunction = async ({
           ee: newCategoryNameEE,
           ru: newCategoryNameRU,
         },
-      }
+      },
     );
 
     const url = new URL(request.url);

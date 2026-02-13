@@ -1,9 +1,23 @@
-import type { ActionFunction, ActionFunctionArgs } from "react-router";
+import {
+  redirect,
+  type ActionFunction,
+  type ActionFunctionArgs,
+} from "react-router";
+import { getSession } from "~/utils/session";
 
 export const action: ActionFunction = async ({
   request,
   params,
 }: ActionFunctionArgs) => {
+  //Check for authentication
+  const cookieHeader = request.headers.get("Cookie");
+  const session = await getSession(cookieHeader);
+
+  //If user is unauthorized
+  if (!session.get("isAdmin")) {
+    return redirect("/login");
+  }
+
   //Get params
   const { selectedGalleryCategory, image } = params;
 
@@ -54,7 +68,7 @@ export const action: ActionFunction = async ({
     process.cwd(),
     "public",
     "gallery",
-    String(selectedGalleryCategory)
+    String(selectedGalleryCategory),
   );
 
   //Ensure that gallery folder exists
